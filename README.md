@@ -5,10 +5,11 @@ A minimal, GOT portfolio site built with static HTML, CSS and a touch of JavaScr
 ## Pages
 
 - `index.html` – Landing page with full‑bleed fantasy hero image and short introduction.
-- `projects/index.html` – Project feed using a modular, Medium‑style card layout.
-- `blog/index.html` – Blog feed sharing the same structure and styling as the projects page.
+- `projects.html` – Project feed using a modular, Medium‑style card layout.
+- `blogs.html` – Blog feed sharing the same structure and styling as the projects page.
 - `posts/` – Individual blog post pages linked from the blog feed.
-- `contact/index.html` – Simple contact form and contact details.
+- `resume.html` – Resume page.
+- `contact.html` – Simple contact form and contact details.
 
 ## Development
 

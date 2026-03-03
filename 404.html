@@ -4,7 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Lost in the Forest · Manas S.</title>
-    <link rel="stylesheet" href="./styles.css" />
+    <script>
+      // Set correct base path for CSS and other resources on GitHub Pages
+      const basePath = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" ? "" : "/iron-portfolio";
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = basePath + '/styles.css';
+      document.head.appendChild(link);
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
