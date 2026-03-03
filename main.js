@@ -9,13 +9,16 @@ function renderHeader(pageKey) {
       ? "projects"
       : pageKey;
 
-  
+  // Determine if this is a nested page (blog-post or project-detail)
+  const isNested = pageKey === "blog-post" || pageKey === "project-detail";
+  const prefix = isNested ? "../" : "./";
+
   const links = [
-    { key: "home", href: `index.html`, label: "Home" },
-    { key: "projects", href: `projects.html`, label: "Projects" },
-    { key: "blog", href: `blogs.html`, label: "Blog" },
-    { key: "resume", href: `resume.html`, label: "Resume" },
-    { key: "contact", href: `contact.html`, label: "Contact" },
+    { key: "home", href: `${prefix}index.html`, label: "Home" },
+    { key: "projects", href: `${prefix}projects.html`, label: "Projects" },
+    { key: "blog", href: `${prefix}blogs.html`, label: "Blog" },
+    { key: "resume", href: `${prefix}resume.html`, label: "Resume" },
+    { key: "contact", href: `${prefix}contact.html`, label: "Contact" },
   ];
 
   const navLinksHtml = links
@@ -32,9 +35,9 @@ function renderHeader(pageKey) {
 
   header.innerHTML = `
     <div class="site-header__inner">
-      <a href="" class="brand">
+      <a href="${prefix}index.html" class="brand">
         <img
-          src="images/logo.png"
+          src="${prefix}images/logo.png"
           alt="Manas logo"
           class="brand__logo"
         />
