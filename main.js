@@ -9,12 +9,15 @@ function renderHeader(pageKey) {
       ? "projects"
       : pageKey;
 
+  // Determine base path based on environment
+  const basePath = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" ? "" : "/iron-portfolio";
+
   const links = [
-    { key: "home", href: "/index.html", label: "Home" },
-    { key: "projects", href: "/projects/index.html", label: "Projects" },
-    { key: "blog", href: "/blog/index.html", label: "Blog" },
-    { key: "resume", href: "/resume/index.html", label: "Resume" },
-    { key: "contact", href: "/contact/index.html", label: "Contact" },
+    { key: "home", href: `${basePath}/index.html`, label: "Home" },
+    { key: "projects", href: `${basePath}/projects/index.html`, label: "Projects" },
+    { key: "blog", href: `${basePath}/blog/index.html`, label: "Blog" },
+    { key: "resume", href: `${basePath}/resume/index.html`, label: "Resume" },
+    { key: "contact", href: `${basePath}/contact/index.html`, label: "Contact" },
   ];
 
   const navLinksHtml = links
@@ -31,9 +34,9 @@ function renderHeader(pageKey) {
 
   header.innerHTML = `
     <div class="site-header__inner">
-      <a href="/index.html" class="brand">
+      <a href="${basePath}/index.html" class="brand">
         <img
-          src="/images/logo.png"
+          src="${basePath}/images/logo.png"
           alt="Manas logo"
           class="brand__logo"
         />
