@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Writing CSS the Easy Way: FlexBox · Blog · Manas S.</title>
+    <link rel="stylesheet" href="../styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Marcellus&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body
+    class="page"
+    data-page="blog-post"
+    data-footer-note="The hierarchy of CSS is the foundation of responsive design."
+  >
+    <header class="site-header" id="site-header"></header>
+
+    <main class="page__main">
+      <article class="stack">
+        <header class="page-header">
+          <p class="page-header__eyebrow">Frontend · Sep 2020 · 5 min read</p>
+          <h1 class="page-header__title">Writing CSS the Easy Way: FlexBox</h1>
+          <p class="page-header__subtitle">
+            Master the art of CSS layout by understanding hierarchy and the 
+            power of FlexBox — a guide to making responsive, logical designs.
+          </p>
+        </header>
+
+        <figure class="post-hero">
+          <img
+            src="../images/jiraiya.jpg"
+            alt="Fantasy illustration used as a companion image for this article"
+            class="post-hero__image"
+          />
+        </figure>
+
+        <section class="stack">
+          <p>If you have just started writing CSS code, it's highly likely that you are having a hard time making the page responsive or aligning components properly, or positioning components as you have in your mind. This article is about how to maintain the hierarchy of the page and, in turn, making CSS more logical.</p>
+          <p><strong>The best way to learn is to open CodePen and write the code yourself. See what happens.</strong></p>
+        </section>
+
+        <section class="stack">
+          <h2>Maintaining the Hierarchy</h2>
+          <p>Having a complete picture of how the page is structured is important, and <code>&lt;div&gt;</code> is your lifesaver. For example, if you are making a navigation bar, its structure will be something like this:</p>
+          <pre><code>&lt;div class="nav-bar"&gt;
+  &lt;div class="logo"&gt;
+    &lt;h1&gt;LOGO&lt;/h1&gt;
+  &lt;/div&gt;
+  &lt;div class="nav-links-container"&gt;
+    &lt;div class="nav-link"&gt;Home&lt;/div&gt;
+    &lt;div class="nav-link"&gt;About&lt;/div&gt;
+    &lt;div class="nav-link"&gt;Contact&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+          <p>This structure will help tremendously when you apply CSS to it.</p>
+
+          <figure class="post-hero">
+            <img
+              src="../images/jiraiya.jpg"
+              alt="Illustration for hierarchy section"
+              class="post-hero__image"
+            />
+          </figure>
+        </section>
+
+        <section class="stack">
+          <h2>Adding Background Color for Better Visualization</h2>
+          <p>Here I have added different background colors to all the components. Now you can see clearly how much space each one is taking and how it is aligned with respect to its parent container.</p>
+          <p><em>Note: I have added padding so you can see more clearly, but you don't need to do that after you understand the structure.</em></p>
+          <pre><code>.nav-bar {
+  background-color: green;
+  padding: 5px;
+}
+
+.logo {
+  background-color: red;
+}
+
+.nav-links-container {
+  background-color: blue;
+  padding: 10px;
+}
+
+.nav-link {
+  background-color: yellow;
+  margin: 2px;
+}</code></pre>
+
+          <figure class="post-hero">
+            <img
+              src="../images/jiraiya.jpg"
+              alt="Illustration for background color section"
+              class="post-hero__image"
+            />
+          </figure>
+        </section>
+
+        <section class="stack">
+          <h2>Using FlexBox</h2>
+          <p>Now you know how to structure your nav bar, but it doesn't look quite right. Here comes <strong>FlexBox!</strong></p>
+          <p>Flexbox is a module that aims at providing a more efficient way to lay out, align, and distribute space among items in a container. Set the <code>display</code> property of any container to <code>flex</code>, and all child components inside that container are arranged in sort of an array—either horizontally (default) or vertically.</p>
+          <pre><code>.nav-bar {
+  display: flex;
+}
+/* To change the direction to vertical, add:
+   flex-direction: column; */</code></pre>
+
+          <figure class="post-hero">
+            <img
+              src="../images/jiraiya.jpg"
+              alt="Illustration for flexbox section"
+              class="post-hero__image"
+            />
+          </figure>
+        </section>
+
+        <section class="stack">
+          <h2>Sizing Child Elements with Flex Property</h2>
+          <p>You can see the components are arranged horizontally, but the width doesn't look quite right. For this, we use the <code>flex</code> property.</p>
+          <p><strong>Keep in mind:</strong> Only the child containers of the container having <code>display</code> set to flex can use the flex property.</p>
+          <p>The <code>flex</code> property defines the ratio of the total width/height the child containers will take. If we want the logo and nav-links-container to have equal width (1:1 ratio), we set <code>flex: 1</code> in both:</p>
+          <pre><code>.logo, .nav-links-container {
+  flex: 1;
+}
+/* Change the value to 2:1 to see how it affects the layout */</code></pre>
+
+          <figure class="post-hero">
+            <img
+              src="../images/jiraiya.jpg"
+              alt="Illustration for flex property section"
+              class="post-hero__image"
+            />
+          </figure>
+        </section>
+
+        <section class="stack">
+          <h2>Alignment in FlexBox</h2>
+          <p>Now we can focus on the logo container and nav-links-container separately. In flexbox, there are two types of alignment:</p>
+          <ul>
+            <li><strong>Main-axis:</strong> The axis along which child components are aligned</li>
+            <li><strong>Cross-axis:</strong> The perpendicular axis</li>
+          </ul>
+          
+          <h3>Aligning Along the Main-Axis</h3>
+          <p>To align child components along the main-axis, use <code>justify-content: center</code>:</p>
+          <pre><code>.logo {
+  justify-content: center;
+}</code></pre>
+
+          <h3>Using Space-Around</h3>
+          <p>To distribute nav-links more efficiently, use <code>justify-content: space-around</code>:</p>
+          <pre><code>.nav-links-container {
+  justify-content: space-around;
+}</code></pre>
+          <p>There are more values that can be given to <code>justify-content</code> that you can research on your own.</p>
+
+          <h3>Aligning Along the Cross-Axis</h3>
+          <p>To align nav-links along the vertical axis (cross-axis), use the <code>align-items</code> property:</p>
+          <pre><code>.nav-link {
+  display: flex;
+  align-items: center;
+}
+}</code></pre>
+
+          <figure class="post-hero">
+            <img
+              src="../images/jiraiya.jpg"
+              alt="Illustration for alignment section"
+              class="post-hero__image"
+            />
+          </figure>
+        </section>
+
+        <section class="stack">
+          <h2>Making It Responsive with Media Queries</h2>
+          <p>The <code>@media</code> rule, introduced in CSS2, made it possible to define different style rules for different media types. This means you can have different CSS rules based on the screen size, viewport, or orientation.</p>
+          <p>For example, if the screen size decreases to 800px or less (indicating a mobile device), we can change the flex-direction to column:</p>
+          <pre><code>@media (max-width: 800px) {
+  .nav-bar {
+    flex-direction: column;
+  }
+}</code></pre>
+
+          <figure class="post-hero">
+            <img
+              src="../images/jiraiya.jpg"
+              alt="Illustration for media queries section"
+              class="post-hero__image"
+            />
+          </figure>
+        </section>
+
+        <section class="stack">
+          <h2>Key Takeaways</h2>
+          <ul>
+            <li><code>display: flex</code> — Arrange components horizontally/vertically</li>
+            <li><code>flex-direction</code> — Change the axis along which components are arranged</li>
+            <li><code>flex</code> — Set the width of child components relative to the parent container</li>
+            <li><code>justify-content</code> — Align components along the main-axis</li>
+            <li><code>align-items</code> — Align components along the cross-axis</li>
+            <li><code>@media</code> — Define different style rules for different media types</li>
+          </ul>
+        </section>
+
+        <section>
+          <p><strong>Before you go:</strong> Reading this for the first time, you might find it a bit tricky to understand. Try writing the code alongside as you read. Remember, the thinking process behind solving a problem is much more important than just being able to solve the problem.</p>
+        </section>
+
+        <a href="../blog/index.html" class="button button--ghost">← Back to Blog</a>
+      </article>
+    </main>
+
+    <footer class="site-footer" id="site-footer"></footer>
+
+    <script src="../main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Maze Solver Bot · Projects · Manas S.</title>
+    <link rel="stylesheet" href="../styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Marcellus&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body
+    class="page"
+    data-page="project-detail"
+    data-footer-note="Projects from this little grove."
+  >
+    <header class="site-header" id="site-header"></header>
+
+    <main class="page__main">
+      <article class="stack">
+        <header class="page-header">
+          <p class="page-header__eyebrow">Robotics · Arduino · C++</p>
+          <h1 class="page-header__title">Maze Solver Bot</h1>
+          <p class="page-header__subtitle">
+            An autonomous robot that navigates and solves mazes using line-following and intelligent decision-making.
+          </p>
+        </header>
+
+        <figure class="post-hero">
+          <img
+            src="../images/jiraiya.jpg"
+            alt="Autonomous maze-solving robot project"
+            class="post-hero__image"
+          />
+        </figure>
+
+        <section class="stack">
+          <h2>The Challenge</h2>
+          <p>
+            Maze solving is a classic problem in robotics that combines hardware integration, 
+            sensor processing, and algorithmic thinking. The challenge was to design and build 
+            a physical robot that could autonomously navigate through an unknown maze without 
+            human intervention, using only its onboard sensors and embedded logic.
+          </p>
+
+          <h2>The Solution</h2>
+          <p>
+            The Maze Solver Bot is built on an Arduino Uno platform, equipped with IR (infrared) 
+            sensors to detect lines and walls. The robot traverses mazes using a combination of 
+            two key strategies: line following and the left-hand rule.
+          </p>
+          <p>
+            The bot's approach prioritizes left turns whenever possible—if a left path is detected, 
+            it takes it. If no left turn is available, it attempts to go straight. If that's blocked, 
+            it turns right. When faced with a dead end, the robot performs a U-turn and backtracks. 
+            This strategy guarantees that the bot will find the exit without getting stuck in loops.
+          </p>
+
+          <h2>Core Navigation Algorithm</h2>
+          <ul class="feature-list">
+            <li><strong>Line Following:</strong> Uses IR sensors to maintain position on the path and detect directional choices</li>
+            <li><strong>Left-Hand Rule:</strong> Prioritizes left turns when multiple paths are available</li>
+            <li><strong>Dead-End Detection:</strong> Recognizes when the bot reaches a dead end and performs U-turns</li>
+            <li><strong>Path Optimization:</strong> The navigational logic guarantees maze completion without infinite loops</li>
+          </ul>
+
+          <h2>Hardware Components</h2>
+          <ul class="feature-list">
+            <li><strong>Arduino Uno:</strong> Microcontroller managing sensor input and motor control</li>
+            <li><strong>IR Sensors:</strong> Multiple infrared sensors for line detection and obstacle avoidance</li>
+            <li><strong>DC Motors:</strong> Dual motors driving the left and right wheels for movement and turning</li>
+            <li><strong>Lithium Ion Batteries:</strong> Providing efficient, reliable power for extended operation</li>
+          </ul>
+
+          <h2>Technical Implementation</h2>
+          <p>
+            The firmware is written in C++ for the Arduino platform. The code manages:
+          </p>
+          <ul class="feature-list">
+            <li>Sensor input reading and interpretation</li>
+            <li>Real-time motor control and speed adjustment</li>
+            <li>Decision-making logic based on sensor data</li>
+            <li>State management for tracking robot behavior</li>
+            <li>Synchronized motor movement for precise navigation</li>
+          </ul>
+
+          <h2>Learning Outcomes</h2>
+          <p>
+            This project bridges the gap between theoretical computer science and practical engineering. 
+            It demonstrates how algorithms must adapt to physical constraints and sensor limitations. 
+            Key learnings include:
+          </p>
+          <ul class="feature-list">
+            <li>Embedded systems programming and microcontroller development</li>
+            <li>Hardware sensor integration and signal processing</li>
+            <li>Real-time systems and responsive control logic</li>
+            <li>Debugging physical systems where timing and precision matter</li>
+            <li>Algorithm design that works reliably despite sensor noise and mechanical variation</li>
+          </ul>
+
+          <h2>Maze-Solving Strategy: The Left-Hand Rule</h2>
+          <p>
+            The left-hand rule is an elegant solution to maze-solving that works on a fundamental principle: 
+            if you keep your left hand on the wall and follow it, you will eventually reach the exit. 
+            This project implements this strategy through a hierarchy of decisions, making it both 
+            simple to understand and reliable in practice.
+          </p>
+
+          <a href="https://github.com/GhostlyPresence/Maze-Solver-Bot" 
+             class="button button--primary" target="_blank" rel="noopener noreferrer">
+            View on GitHub
+          </a>
+          <a href="./index.html" class="button button--ghost">← Back to Projects</a>
+        </section>
+      </article>
+    </main>
+
+    <footer class="site-footer" id="site-footer"></footer>
+
+    <script src="../main.js"></script>
+  </body>
+</html>

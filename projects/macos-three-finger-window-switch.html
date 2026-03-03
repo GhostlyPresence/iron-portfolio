@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>macOS Three Finger Window Switch · Projects · Manas S.</title>
+    <link rel="stylesheet" href="../styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Marcellus&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body
+    class="page"
+    data-page="project-detail"
+    data-footer-note="Projects from this little grove."
+  >
+    <header class="site-header" id="site-header"></header>
+
+    <main class="page__main">
+      <article class="stack">
+        <header class="page-header">
+          <p class="page-header__eyebrow">Open Source · GNOME Extension · JavaScript</p>
+          <h1 class="page-header__title">macOS Three Finger Window Switch</h1>
+          <p class="page-header__subtitle">
+            Bringing macOS gestures to GNOME Shell — seamless window management for Linux.
+          </p>
+        </header>
+
+        <figure class="post-hero">
+          <img
+            src="../images/jiraiya.jpg"
+            alt="GNOME Shell window management extension"
+            class="post-hero__image"
+          />
+        </figure>
+
+        <section class="stack">
+          <h2>The Challenge</h2>
+          <p>
+            Coming from macOS, one of the most intuitive features is the three-finger swipe gesture 
+            for switching between open windows. On Linux with GNOME Shell, this familiar workflow 
+            wasn't available. The goal was to recreate that seamless experience and bring the 
+            intuition of macOS window management to the Linux desktop.
+          </p>
+
+          <h2>The Solution</h2>
+          <p>
+            This GNOME Shell extension intelligently tracks all open windows and automatically 
+            maximizes them while moving them between workspaces. It works in harmony with GNOME's 
+            native window management system, providing a smooth and predictable experience that 
+            feels natural to anyone who's used macOS.
+          </p>
+          <p>
+            The extension is built with JavaScript and integrates directly with GNOME Shell's 
+            windowing system. It supports GNOME Shell 46+, ensuring compatibility with modern 
+            Linux desktops while maintaining minimal overhead.
+          </p>
+
+          <h2>Key Features</h2>
+          <ul class="feature-list">
+            <li><strong>Maximize to Workspace:</strong> Windows automatically maximize when moving between workspaces for optimal usage of screen real estate</li>
+            <li><strong>Intelligent Window Tracking:</strong> Monitors all open windows and their states in real-time</li>
+            <li><strong>Seamless Integration:</strong> Works smoothly with GNOME Shell's native window management without conflicts</li>
+            <li><strong>Zero Configuration:</strong> Install and it just works — no complex settings needed</li>
+          </ul>
+
+          <h2>Technology Stack</h2>
+          <ul class="feature-list">
+            <li>JavaScript (100% of the codebase)</li>
+            <li>GNOME Shell Extension API</li>
+            <li>Modern Linux desktop integration</li>
+          </ul>
+
+          <h2>Open Source Philosophy</h2>
+          <p>
+            This project is freely available on GitHub and welcomes contributions from the community. 
+            It represents a commitment to making the Linux desktop experience smoother and more 
+            intuitive for users transitioning from other operating systems.
+          </p>
+
+          <a href="https://github.com/GhostlyPresence/macOS-three-finger-window-switch-gnome" 
+             class="button button--primary" target="_blank" rel="noopener noreferrer">
+            View on GitHub
+          </a>
+          <a href="./index.html" class="button button--ghost">← Back to Projects</a>
+        </section>
+      </article>
+    </main>
+
+    <footer class="site-footer" id="site-footer"></footer>
+
+    <script src="../main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,10 @@
+{
+  "name": "got-portfolio-2026",
+  "version": "1.0.0",
+  "description": "Minimal GOT-themed portfolio by Manas S.",
+  "private": true,
+  "scripts": {
+    "start": "python -m http.server 8000"
+  }
+}
+

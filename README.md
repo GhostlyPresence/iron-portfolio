@@ -1,6 +1,6 @@
-# Fantasy Portfolio – Manas S.
+# Iron Portfolio – Manas S.
 
-A minimal, fairy‑tale‑inspired portfolio site built with static HTML, CSS and a touch of JavaScript. The primary color is a soft forest green, with subtle pastel accents to keep the interface calm and focused.
+A minimal, GOT portfolio site built with static HTML, CSS and a touch of JavaScript. The primary color is a soft forest green, with subtle pastel accents to keep the interface calm and focused.
 
 ## Pages
 

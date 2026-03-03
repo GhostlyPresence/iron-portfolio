@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gesture Controlled Mouse Pointer · Projects · Manas S.</title>
+    <link rel="stylesheet" href="../styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Marcellus&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body
+    class="page"
+    data-page="project-detail"
+    data-footer-note="Projects from this little grove."
+  >
+    <header class="site-header" id="site-header"></header>
+
+    <main class="page__main">
+      <article class="stack">
+        <header class="page-header">
+          <p class="page-header__eyebrow">Open Source · Computer Vision · Python</p>
+          <h1 class="page-header__title">Gesture Controlled Mouse Pointer</h1>
+          <p class="page-header__subtitle">
+            Control your computer's mouse pointer with hand gestures using color detection and computer vision.
+          </p>
+        </header>
+
+        <figure class="post-hero">
+          <img
+            src="../images/jiraiya.jpg"
+            alt="Computer vision gesture control project"
+            class="post-hero__image"
+          />
+        </figure>
+
+        <section class="stack">
+          <h2>The Challenge</h2>
+          <p>
+            Traditional input methods like keyboards and mice have been the standard for decades. 
+            But what if you could control your computer using nothing but hand gestures? 
+            This project explores the intersection of computer vision and human-computer interaction, 
+            making hands-free mouse control a reality.
+          </p>
+
+          <h2>The Solution</h2>
+          <p>
+            This Python-based application leverages OpenCV to detect and track hand gestures using 
+            color detection. By wearing a distinctly colored glove (typically green), the program 
+            tracks the hand's position in real-time and translates it directly to mouse pointer movement.
+          </p>
+          <p>
+            The implementation uses a sophisticated computer vision pipeline: it captures video from 
+            a webcam, performs color-space detection on the glove color, creates a mask of the detected 
+            region, and then calculates the bounding circle to find the precise hand position. 
+            This position is then mapped to the screen coordinates and the mouse pointer follows in real-time.
+          </p>
+
+          <h2>Technical Implementation</h2>
+          <ul class="feature-list">
+            <li><strong>Color Space Detection:</strong> Uses HSV and BGR color spaces to accurately detect the glove</li>
+            <li><strong>Image Masking:</strong> Creates binary masks from thresholded color detection</li>
+            <li><strong>Contour Analysis:</strong> Finds minimum bounding circles around detected gestures</li>
+            <li><strong>Mouse Control:</strong> Integrates PyAutoGUI to move the system mouse pointer</li>
+            <li><strong>Real-time Processing:</strong> Achieves fluid gesture-to-cursor mapping</li>
+          </ul>
+
+          <h2>Key Technologies</h2>
+          <ul class="feature-list">
+            <li><strong>OpenCV (cv2):</strong> Computer vision library for image processing and gesture recognition</li>
+            <li><strong>PyAutoGUI:</strong> Cross-platform mouse and keyboard control</li>
+            <li><strong>Python:</strong> 100% pure Python implementation for accessibility</li>
+            <li><strong>Webcam Input:</strong> Uses built-in or external camera for gesture tracking</li>
+          </ul>
+
+          <h2>Learning Experience</h2>
+          <p>
+            This project was an exploration into computer vision fundamentals — color spaces, 
+            image thresholding, contour detection, and geometric calculations. It demonstrates 
+            how mathematical principles can be applied to create intuitive human-computer interfaces, 
+            and how accessible tools like OpenCV can bring sophisticated vision-based applications 
+            to life.
+          </p>
+
+          <h2>Use Cases</h2>
+          <ul class="feature-list">
+            <li>Hands-free interaction for presentations</li>
+            <li>Accessibility tools for users with limited mobility</li>
+            <li>Exploration of natural gesture-based interfaces</li>
+            <li>Educational demonstrations of computer vision concepts</li>
+            <li>Foundation for building more complex gesture recognition systems</li>
+          </ul>
+
+          <a href="https://github.com/GhostlyPresence/GestureControlledMousePointer" 
+             class="button button--primary" target="_blank" rel="noopener noreferrer">
+            View on GitHub
+          </a>
+          <a href="./index.html" class="button button--ghost">← Back to Projects</a>
+        </section>
+      </article>
+    </main>
+
+    <footer class="site-footer" id="site-footer"></footer>
+
+    <script src="../main.js"></script>
+  </body>
+</html>

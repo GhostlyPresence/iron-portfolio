@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contact · Manas S.</title>
+    <link rel="stylesheet" href="../styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Marcellus&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body
+    class="page"
+    data-page="contact"
+    data-footer-note="A raven sent is a raven received."
+  >
+    <header class="site-header" id="site-header"></header>
+
+    <main class="page__main">
+      <header class="page-header">
+        <p class="page-header__eyebrow">Send a Raven</p>
+        <h1 class="page-header__title">Contact</h1>
+        <p class="page-header__subtitle">
+          In the Seven Kingdoms, word travels by raven. Reach out about roles,
+          collaborations, or to discuss the code that builds crowns.
+        </p>
+      </header>
+
+      <section class="grid-two">
+        <div class="contact-form__wrapper">
+          <form class="stack stack--space-lg" action="mailto:ten3097@gmail.com">
+          <div class="field-group">
+            <label class="field-label" for="name">Name</label>
+            <input
+              id="name"
+              name="name"
+              class="field-input"
+              type="text"
+              autocomplete="name"
+              required
+            />
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="email">Email</label>
+            <input
+              id="email"
+              name="email"
+              class="field-input"
+              type="email"
+              autocomplete="email"
+              required
+            />
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="message">Message</label>
+            <textarea
+              id="message"
+              name="message"
+              class="field-textarea"
+              rows="5"
+              required
+            ></textarea>
+          </div>
+
+          <button type="submit" class="button button--primary">
+            Send Raven
+          </button>
+        </form>
+        </div>
+
+        <aside class="sidebar-note contact-meta">
+          <p>
+            Prefer a more direct route across the Narrow Sea? You can also reach
+            me at:
+          </p>
+          <ul class="contact-meta__list">
+            <li>
+              <span class="contact-meta__label">Email</span><br />
+              <span class="contact-meta__value">ten3097@gmail.com</span>
+            </li>
+            <li>
+              <span class="contact-meta__label">GitHub</span><br />
+              <span class="contact-meta__value">https://github.com/GhostlyPresence</span>
+            </li>
+            <li>
+              <span class="contact-meta__label">Location</span><br />
+              <span class="contact-meta__value">A quiet corner in the realm of code</span>
+            </li>
+          </ul>
+        </aside>
+      </section>
+    </main>
+
+    <footer class="site-footer" id="site-footer"></footer>
+
+    <script src="../main.js"></script>
+  </body>
+</html>
