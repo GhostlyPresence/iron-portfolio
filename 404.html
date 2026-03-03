@@ -38,22 +38,22 @@
                 </a>
               </li>
               <li>
-                <a href="./projects/index.html" class="not-found__link">
+                <a href="./projects.html" class="not-found__link">
                   🏛️ Castles Built
                 </a>
               </li>
               <li>
-                <a href="./blog/index.html" class="not-found__link">
+                <a href="./blogs.html" class="not-found__link">
                   📚 The Archives
                 </a>
               </li>
               <li>
-                <a href="./resume/index.html" class="not-found__link">
+                <a href="./resume.html" class="not-found__link">
                   📜 The Scroll of Mastery
                 </a>
               </li>
               <li>
-                <a href="./contact/index.html" class="not-found__link">
+                <a href="./contact.html" class="not-found__link">
                   🦅 Send a Raven
                 </a>
               </li>
@@ -80,5 +80,18 @@
     <footer class="site-footer" id="site-footer"></footer>
 
     <script src="./main.js"></script>
+    <script>
+      // Update 404 page links with correct base path
+      document.addEventListener('DOMContentLoaded', () => {
+        const basePath = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" ? "" : "/iron-portfolio";
+        const links = document.querySelectorAll('.not-found__link');
+        links.forEach(link => {
+          const href = link.getAttribute('href');
+          if (href.startsWith('./')) {
+            link.setAttribute('href', basePath + href.slice(1));
+          }
+        });
+      });
+    </script>
   </body>
 </html>

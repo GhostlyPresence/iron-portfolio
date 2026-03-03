@@ -14,10 +14,10 @@ function renderHeader(pageKey) {
 
   const links = [
     { key: "home", href: `index.html`, label: "Home" },
-    { key: "projects", href: `projects/index.html`, label: "Projects" },
-    { key: "blog", href: `blog/index.html`, label: "Blog" },
-    { key: "resume", href: `resume/index.html`, label: "Resume" },
-    { key: "contact", href: `contact/index.html`, label: "Contact" },
+    { key: "projects", href: `projects.html`, label: "Projects" },
+    { key: "blog", href: `blogs.html`, label: "Blog" },
+    { key: "resume", href: `resume.html`, label: "Resume" },
+    { key: "contact", href: `contact.html`, label: "Contact" },
   ];
 
   const navLinksHtml = links

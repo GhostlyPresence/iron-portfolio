@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Blog · Manas S.</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Marcellus&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body
+    class="page"
+    data-page="blog"
+    data-footer-note="Quiet notes from the path."
+  >
+    <header class="site-header" id="site-header"></header>
+
+    <main class="page__main">
+      <header class="page-header">
+        <p class="page-header__eyebrow">Field Notes</p>
+        <h1 class="page-header__title">Blog</h1>
+        <p class="page-header__subtitle">
+          Short dispatches from the path — lessons learned while building
+          software in this small, green corner of the web.
+        </p>
+      </header>
+
+      <section class="grid-two">
+        <div class="feed stack">
+          <article class="feed-item">
+            <div class="feed-item__meta">
+              <span class="tag">Frontend</span>
+              <span>Sep 2020 · 5 min read</span>
+            </div>
+            <h2 class="feed-item__title">
+              <a href="./posts/post-writing-css-flexbox-way.html">Writing CSS the Easy Way: FlexBox</a>
+            </h2>
+            <p class="feed-item__summary">
+              Master the art of CSS layout by understanding hierarchy and the 
+              power of FlexBox — a guide to making responsive, logical designs 
+              that scale effortlessly.
+            </p>
+          </article>
+
+          <article class="feed-item">
+            <div class="feed-item__meta">
+              <span class="tag">Learning</span>
+              <span>Sep 2020 · 5 min read</span>
+            </div>
+            <h2 class="feed-item__title">
+              <a href="./posts/post-9-concepts-before-learning-programming.html">9 Computer Science Concepts Before Learning Programming</a>
+            </h2>
+            <p class="feed-item__summary">
+              Essential foundations for every beginner — the fundamentals that bridge 
+              the gap between having no idea and becoming a true coder of the realm.
+            </p>
+          </article>
+
+          <article class="feed-item">
+            <div class="feed-item__meta">
+              <span class="tag">Notes</span>
+              <span>Jan 2026 · 2 min read</span>
+            </div>
+            <h2 class="feed-item__title">
+              <a href="./posts/post-why-i-like-quiet-themes.html">Why I Like Quiet Themes</a>
+            </h2>
+            <p class="feed-item__summary">
+              Thoughts on using soft colors, generous spacing, and gentle
+              motion to make interfaces feel like calm places instead of noisy
+              dashboards.
+            </p>
+          </article>
+        </div>
+
+        <!-- <aside class="sidebar-note">
+          This page is intentionally minimal and modular — think of each entry
+          as a card you could lift out and expand into its own story, similar
+          to reading feeds on Medium.
+        </aside> -->
+      </section>
+    </main>
+
+    <footer class="site-footer" id="site-footer"></footer>
+
+    <script src="./main.js"></script>
+  </body>
+</html>
