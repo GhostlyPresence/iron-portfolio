@@ -32,9 +32,11 @@ function renderHeader(pageKey) {
     })
     .join("");
 
+    //      <a href="index.html" class="brand">
+
   header.innerHTML = `
     <div class="site-header__inner">
-      <a href="index.html" class="brand">
+
         <img
           src="images/logo.png"
           alt="Manas logo"
