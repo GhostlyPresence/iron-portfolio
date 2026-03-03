@@ -9,9 +9,7 @@ function renderHeader(pageKey) {
       ? "projects"
       : pageKey;
 
-  // Determine base path based on environment
-  const basePath = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" ? "" : "/iron-portfolio";
-
+  
   const links = [
     { key: "home", href: `index.html`, label: "Home" },
     { key: "projects", href: `projects.html`, label: "Projects" },
@@ -32,11 +30,9 @@ function renderHeader(pageKey) {
     })
     .join("");
 
-    //      <a href="index.html" class="brand">
-
   header.innerHTML = `
     <div class="site-header__inner">
-
+      <a href="" class="brand">
         <img
           src="images/logo.png"
           alt="Manas logo"
