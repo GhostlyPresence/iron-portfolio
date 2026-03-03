@@ -34,9 +34,9 @@ function renderHeader(pageKey) {
 
   header.innerHTML = `
     <div class="site-header__inner">
-      <a href="${basePath}/index.html" class="brand">
+      <a href="index.html" class="brand">
         <img
-          src="${basePath}/images/logo.png"
+          src="images/logo.png"
           alt="Manas logo"
           class="brand__logo"
         />
