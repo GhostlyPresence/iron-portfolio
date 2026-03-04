@@ -28,3 +28,4 @@ Place your fantasy hero artwork inside the `images` folder and name it `landing-
 
 ## Logo image Credit
 <a href="https://www.flaticon.com/free-icons/medieval" title="medieval icons">Medieval icons created by Icongeek26 - Flaticon</a>
+<a href="https://www.flaticon.com/free-icons/sword" title="sword icons">Sword icons created by Freepik - Flaticon</a>
