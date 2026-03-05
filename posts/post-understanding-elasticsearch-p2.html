@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Understanding Elasticsearch (Part 2) · Blog · Manas S.</title>
+    <link rel="stylesheet" href="../styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Marcellus&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/png" href="../images/logo.png" />
+  </head>
+
+  <body
+    class="page"
+    data-page="blog-post"
+    data-footer-note="Notes on distributed systems and search."
+  >
+    <header class="site-header" id="site-header"></header>
+
+    <main class="page__main">
+      <article class="stack">
+        <header class="page-header">
+          <p class="page-header__eyebrow">Engineering Notes · 2026 · 12 min read</p>
+          <h1 class="page-header__title">
+            Understanding Elasticsearch — Part 2 (Internals)
+          </h1>
+          <p class="page-header__subtitle">
+            How queries are executed, why doc values exist, and what actually
+            happens inside the cluster when you search.
+          </p>
+        </header>
+
+        <figure class="post-hero">
+          <img
+            src="../images/jiraiya.jpg"
+            alt="Illustration used as a companion image for this article"
+            class="post-hero__image"
+          />
+        </figure>
+
+        <section class="stack">
+          <p>
+            In the first part of this series we covered the basics of
+            Elasticsearch — documents, indices, inverted indices, and how
+            search works at a conceptual level.
+          </p>
+
+          <p>
+            In this article we will go deeper into the mechanics of the system.
+            Understanding these internals helps explain why Elasticsearch is
+            fast, how it scales, and what trade-offs it makes compared to
+            traditional databases.
+          </p>
+
+          <p>
+            The main topics we will explore are:
+          </p>
+
+          <ul>
+            <li>Query planning and execution</li>
+            <li>Doc values and column-oriented storage</li>
+            <li>Segments, refresh, and merging</li>
+            <li>Shard-level distributed search</li>
+            <li>How Elasticsearch separates filtering and scoring</li>
+          </ul>
+        </section>
+
+        <section class="stack">
+          <h2>Query Planning in Elasticsearch</h2>
+
+          <p>
+            Unlike relational databases, Elasticsearch does not use a
+            traditional cost-based SQL query planner. Instead, it performs a
+            series of query rewriting and optimization steps before executing
+            the search.
+          </p>
+
+          <p>
+            When a request reaches Elasticsearch, it goes through several
+            stages:
+          </p>
+          <ol>
+            <li>Query parsing</li>
+            <li>Query rewriting</li>
+            <li>Shard routing</li>
+            <li>Query phase</li>
+            <li>Fetch phase</li>
+          </ol>
+          
+
+          <p>
+            The goal of the query planner is to minimize the amount of work
+            required to identify matching documents.
+          </p>
+        </section>
+
+        <section class="stack">
+          <h2>Query Rewriting</h2>
+
+          <p>
+            High-level queries written using Elasticsearch’s Query DSL are
+            internally rewritten into lower-level Lucene queries.
+          </p>
+
+          <p>
+            For example, a simple match query:
+          </p>
+
+<pre>
+{
+  "match": {
+    "title": "running shoes"
+  }
+}
+</pre>
+
+          <p>
+            might be rewritten internally into something closer to a boolean
+            query containing term queries for each token:
+          </p>
+
+<pre>
+title:running OR title:shoes
+</pre>
+
+          <p>
+            This transformation allows Elasticsearch to operate directly on the
+            inverted index.
+          </p>
+
+          <p>
+            Query rewriting also enables other optimizations such as collapsing
+            filters and eliminating unnecessary scoring steps.
+          </p>
+        </section>
+
+        <section class="stack">
+          <h2>Filter Context vs Query Context</h2>
+
+          <p>
+            One of the most important optimizations in Elasticsearch is the
+            distinction between <strong>query context</strong> and
+            <strong>filter context</strong>.
+          </p>
+
+          <p>
+            Query context computes relevance scores. Filter context only checks
+            whether a document matches a condition.
+          </p>
+
+          <p>
+            For example:
+          </p>
+
+<pre>
+{
+  "bool": {
+    "must": [
+      { "match": { "title": "shoes" } }
+    ],
+    "filter": [
+      { "term": { "brand": "Nike" } }
+    ]
+  }
+}
+</pre>
+
+          <p>
+            In this case:
+          </p>
+
+          <ul>
+            <li>The match query contributes to scoring.</li>
+            <li>The term filter simply narrows the candidate set.</li>
+          </ul>
+
+          <p>
+            Filters are faster because they avoid score computation and can be
+            cached.
+          </p>
+        </section>
+
+        <section class="stack">
+          <h2>Doc Values: The Other Side of the Index</h2>
+
+          <p>
+            The inverted index is optimized for answering questions like:
+            <br>
+            <em> >“Which documents contain this term?”</em>
+          </p>
+
+          <p>
+            But many queries require the opposite:
+          <br>
+            <em> >“What is the value of this field for each document?”</em>
+          </p>
+
+          <p>
+            This is where <strong>doc values</strong> come in.
+          </p>
+
+          <p>
+            Doc values are a column-oriented storage structure that stores
+            field values by document rather than by term.
+          <br>
+            Conceptually, doc values look like this:
+          </p>
+
+          <pre>
+          DocID | price
+          -------------
+          1     | 1200
+          2     | 900
+          3     | 3000
+          </pre>
+
+          
+            This structure enables efficient operations such as:
+          <ul>
+            <li>sorting</li>
+            <li>aggregations</li>
+            <li>scripting</li>
+            <li>grouping</li>
+          </ul>
+
+          <p>
+            Without doc values, Elasticsearch would have to reconstruct these
+            values from the inverted index, which would be extremely expensive.
+          </p>
+        </section>
+
+        <section class="stack">
+          <h2>Segments and Near Real-Time Search</h2>
+
+          <p>
+            Elasticsearch achieves near real-time search using a structure
+            called <strong>segments</strong>.
+          </p>
+
+          <p>
+            Each shard is composed of multiple immutable segments. When
+            documents are indexed, they are first written to in-memory buffers
+            and the transaction log.
+          </p>
+
+          <p>
+            During a <strong>refresh</strong> operation, these buffers are
+            converted into a new segment that becomes searchable.
+          </p>
+
+          <p>
+            This is why Elasticsearch is described as
+            <em>near real-time</em> rather than strictly real-time.
+          </p>
+
+          <p>
+            Over time many small segments accumulate, so Elasticsearch
+            periodically merges them into larger ones. This process improves
+            search performance and removes deleted documents.
+          </p>
+        </section>
+
+        <section class="stack">
+          <h2>Distributed Search: The Two-Phase Execution</h2>
+
+          <p>
+            Elasticsearch is designed to run across multiple machines, so a
+            single query must often be executed across many shards.
+          </p>
+
+          <p>
+            Search execution happens in two main phases.
+          </p>
+
+          <h3>1. Query Phase</h3>
+
+          <p>
+            The coordinating node sends the query to all relevant shards.
+            Each shard computes the top matching documents and returns their
+            document IDs and scores.
+          </p>
+
+          <h3>2. Fetch Phase</h3>
+
+          <p>
+            Once the top results are known, the coordinating node asks the
+            relevant shards to return the full document contents.
+          </p>
+
+          <p>
+            This two-phase design minimizes network traffic and ensures that
+            only the most relevant documents are retrieved.
+          </p>
+        </section>
+
+        <section class="stack">
+          <h2>Shards and Replicas</h2>
+
+          <p>
+            To scale horizontally, Elasticsearch divides each index into
+            <strong>primary shards</strong>.
+          </p>
+
+          <p>
+            Each shard contains a subset of the documents in the index. Queries
+            can therefore run in parallel across shards.
+          </p>
+
+          <p>
+            Elasticsearch also supports <strong>replica shards</strong>. These
+            replicas serve two purposes:
+          </p>
+
+          <ul>
+            <li>Fault tolerance</li>
+            <li>Increased search throughput</li>
+          </ul>
+
+          <p>
+            Because replicas can handle search requests, Elasticsearch can
+            distribute query load across multiple nodes.
+          </p>
+        </section>
+
+        <section class="stack">
+          <h2>Putting It All Together</h2>
+
+          <p>
+            When you send a search request to Elasticsearch, the system performs
+            a sequence of carefully optimized steps:
+          </p>
+
+          <ol>
+            <li>The query is parsed and rewritten.</li>
+            <li>Filters narrow the candidate documents.</li>
+            <li>The inverted index identifies matching documents.</li>
+            <li>Doc values are used for sorting and aggregations.</li>
+            <li>Each shard returns its top matches.</li>
+            <li>The coordinating node merges and returns the final results.</li>
+          </ol>
+
+          <p>
+            This architecture allows Elasticsearch to search massive datasets
+            in milliseconds while remaining horizontally scalable.
+          </p>
+        </section>
+
+        <section class="stack">
+          <h2>Closing Thoughts</h2>
+
+          <p>
+            Elasticsearch sits at an interesting intersection of search
+            engines, distributed systems, and analytics platforms.
+          </p>
+
+          <p>
+            Understanding concepts like inverted indices, doc values, segments,
+            and distributed query execution makes it much easier to reason
+            about performance and system design decisions.
+          </p>
+
+          <p>
+            While many applications treat Elasticsearch as a black box, the
+            engineers who understand its internals are able to design far more
+            efficient search systems.
+          </p>
+        </section>
+
+        <a href="../blogs.html" class="button button--ghost">← Back to Blog</a>
+      </article>
+    </main>
+
+    <footer class="site-footer" id="site-footer"></footer>
+
+    <script src="../main.js"></script>
+  </body>
+</html>

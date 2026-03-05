@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Understanding Elasticsearch (Part 1) · Blog · Manas S.</title>
+    <link rel="stylesheet" href="../styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Marcellus&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/png" href="../images/logo.png" />
+  </head>
+
+  <body
+    class="page"
+    data-page="blog-post"
+    data-footer-note="Notes on search, systems, and learning."
+  >
+    <header class="site-header" id="site-header"></header>
+
+    <main class="page__main">
+      <article class="stack">
+        <header class="page-header">
+          <p class="page-header__eyebrow">Engineering Notes · 2026 · 8 min read</p>
+          <h1 class="page-header__title">
+            Understanding Elasticsearch — Part 1 (For Absolute Beginners)
+          </h1>
+          <p class="page-header__subtitle">
+            A gentle introduction to how Elasticsearch works and why modern
+            applications rely on it for fast search.
+          </p>
+        </header>
+
+        <figure class="post-hero">
+          <img
+            src="../images/jiraiya.jpg"
+            alt="Illustration used as a companion image for the Elasticsearch article"
+            class="post-hero__image"
+          />
+        </figure>
+
+        <section class="stack">
+          <p>
+            If you've ever searched for a product on Amazon, looked for a log in
+            an observability dashboard, or filtered results on an e-commerce
+            site, you were likely interacting with a search engine such as
+            <strong>Elasticsearch</strong>.
+          </p>
+
+          <p>
+            Elasticsearch is one of the most widely used search technologies in
+            modern software systems. Yet for many engineers encountering it for
+            the first time, it can feel confusing. Is it a database? A search
+            engine? A distributed system?
+          </p>
+
+          <p>
+            The answer is: a little bit of all three.
+          </p>
+        </section>
+
+        <section class="stack">
+          <h2>What Elasticsearch Really Is</h2>
+
+          <p>
+            Elasticsearch is a <strong>distributed search and analytics
+            engine</strong>. It is built to store large amounts of data and
+            allow users to search that data extremely quickly.
+          </p>
+
+          <p>
+            Instead of scanning every document when you search, Elasticsearch
+            builds special data structures that allow it to jump directly to the
+            relevant results.
+          </p>
+
+          <p>
+            This is why queries that would normally take seconds or minutes in a
+            traditional database can often be answered in milliseconds.
+          </p>
+        </section>
+
+        <section class="stack">
+          <h2>Documents and Indices</h2>
+
+          <p>
+            The basic unit of data in Elasticsearch is a <strong>document</strong>.
+            A document is simply a JSON object that represents a piece of data.
+          </p>
+
+          <pre>
+{
+  "title": "Running Shoes",
+  "brand": "Nike",
+  "price": 1999,
+  "in_stock": true
+}
+          </pre>
+
+          <p>
+            Documents are stored inside something called an
+            <strong>index</strong>. You can think of an index as a collection of
+            related documents, similar to a table in a traditional database.
+          </p>
+        </section>
+
+        <section class="stack">
+          <h2>Why Elasticsearch Is Fast</h2>
+
+          <p>
+            The reason Elasticsearch is fast comes down to something called an
+            <strong>inverted index</strong>.
+          </p>
+
+          <p>
+            Instead of storing documents in a way that requires scanning each
+            one, Elasticsearch builds a structure that maps words to the
+            documents that contain them.
+          </p>
+
+          <p>For example:</p>
+
+          <pre>
+running → [doc1, doc2]
+shoes   → [doc1, doc2, doc3]
+leather → [doc3]
+          </pre>
+
+          <p>
+            When someone searches for “running shoes”, Elasticsearch simply
+            looks up both words and finds the documents that contain them.
+          </p>
+
+          <p>
+            This approach makes search extremely fast even with millions of
+            documents.
+          </p>
+        </section>
+
+        <section class="stack">
+          <h2>Keyword vs Text Fields</h2>
+
+          <p>
+            When storing data in Elasticsearch, fields are usually mapped as
+            either <strong>keyword</strong> or <strong>text</strong>.
+          </p>
+
+          <p>
+            A <strong>keyword</strong> field stores the value exactly as it is.
+            It is useful for filtering, sorting, and aggregations.
+          </p>
+
+          <p>
+            A <strong>text</strong> field, on the other hand, is analyzed and
+            broken into searchable tokens. This makes it useful for full-text
+            search.
+          </p>
+
+          <p>
+            For example, the sentence:
+          </p>
+
+          <pre>
+"user bought two shoes"
+          </pre>
+
+          <p>
+            might be indexed as the tokens:
+          </p>
+
+          <pre>
+user, bought, two, shoes
+          </pre>
+        </section>
+
+        <section class="stack">
+          <h2>Distributed by Design</h2>
+
+          <p>
+            Elasticsearch is also designed to run across multiple machines.
+            Data is split into pieces called <strong>shards</strong>, which are
+            distributed across nodes in a cluster.
+          </p>
+
+          <p>
+            This allows Elasticsearch to scale horizontally. Instead of one
+            server doing all the work, many servers can process searches in
+            parallel.
+          </p>
+
+          <p>
+            To ensure reliability, Elasticsearch also keeps
+            <strong>replica shards</strong>. If one node fails, another node can
+            immediately take over.
+          </p>
+        </section>
+
+        <section class="stack">
+          <h2>Why So Many Systems Use Elasticsearch</h2>
+
+          <p>
+            Elasticsearch has become a standard part of many modern
+            architectures because it solves a very common problem:
+          </p>
+
+          <p>
+            Applications need to search large datasets quickly while supporting
+            filtering, ranking, and analytics.
+          </p>
+
+          <p>
+            Instead of building a search system from scratch, teams rely on
+            Elasticsearch to handle that complexity.
+          </p>
+        </section>
+
+        <section class="stack">
+          <h2>Coming Next</h2>
+
+          <p>
+            In the next article we will move beyond the basics and explore how
+            Elasticsearch works internally:
+          </p>
+
+          <ul>
+            <li>query planning and execution</li>
+            <li>doc values and aggregations</li>
+            <li>shards, replicas, and cluster coordination</li>
+            <li>how Elasticsearch processes searches across nodes</li>
+          </ul>
+
+          <p>
+            Understanding these concepts makes it much easier to design systems
+            that use Elasticsearch effectively.
+          </p>
+        </section>
+
+        <a href="../blogs.html" class="button button--ghost">← Back to Blog</a>
+      </article>
+    </main>
+
+    <footer class="site-footer" id="site-footer"></footer>
+
+    <script src="../main.js"></script>
+  </body>
+</html>

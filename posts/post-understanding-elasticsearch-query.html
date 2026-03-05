@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Building Elasticsearch Queries Step by Step · Blog · Manas S.</title>
+    <link rel="stylesheet" href="../styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Marcellus&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/png" href="../images/logo.png" />
+  </head>
+
+  <body
+    class="page"
+    data-page="blog-post"
+    data-footer-note="Notes on search, systems, and learning."
+  >
+    <header class="site-header" id="site-header"></header>
+
+    <main class="page__main">
+      <article class="stack">
+        <header class="page-header">
+          <p class="page-header__eyebrow">Engineering Notes · 2026 · 10 min read</p>
+          <h1 class="page-header__title">
+            Writing Elasticsearch Queries (Step by Step)
+          </h1>
+          <p class="page-header__subtitle">
+            A beginner-friendly guide to constructing Elasticsearch Query DSL JSON from scratch.
+          </p>
+        </header>
+
+        <figure class="post-hero">
+          <img
+            src="../images/jiraiya.jpg"
+            alt="Illustration used as a companion image for this article"
+            class="post-hero__image"
+          />
+        </figure>
+
+        <section class="stack">
+          <p>
+            One of the first things engineers notice when using Elasticsearch is
+            that queries are written in <strong>JSON</strong>, not SQL.
+          </p>
+
+          <p>
+            If you come from a relational database background, this can feel
+            strange at first. Instead of writing something like:
+          </p>
+
+<pre><code>
+SELECT * FROM products WHERE brand = 'Nike'
+</code></pre>
+
+          <p>
+            Elasticsearch requires a JSON structure describing the query.
+          
+            At first glance this JSON can look intimidating, but the structure
+            is actually very logical once you build it step by step.
+          
+            In this article we will start with a simple document and gradually
+            build a realistic Elasticsearch query.
+          </p>
+        </section>
+
+        <section class="stack">
+          <h2>The Example Document</h2>
+
+          <p>
+            Before writing queries, we need to understand what our data looks
+            like.
+          </p>
+
+          <p>
+            Imagine we have an Elasticsearch index called
+            <strong>products</strong> containing documents like this:
+          </p>
+
+<pre><code>
+{
+  "title": "Running Shoes",
+  "brand": "Nike",
+  "price": 1999,
+  "city": "Bengaluru",
+  "in_stock": true
+}
+</code></pre>
+
+          <p>
+            Each document represents a product. In real systems there might be
+            millions of such documents.
+          </p>
+
+          <p>
+            Our goal is to search through these documents and find the ones that
+            match certain conditions.
+          </p>
+        </section>
+
+        <section class="stack">
+          <h2>The Basic Structure of an Elasticsearch Query</h2>
+
+          <p>
+            Every Elasticsearch search request contains a top-level
+            <strong>query</strong> field.
+          </p>
+
+<pre><code>
+{
+  "query": {}
+}
+</code></pre>
+
+          <p>
+            Think of this field as the place where you describe the conditions
+            documents must satisfy.
+          </p>
+
+          <p>
+            Everything about your search will live inside this object.
+          </p>
+        </section>
+
+        <section class="stack">
+          <h2>Step 1 — Searching Text with a Match Query</h2>
+
+          <p>
+            Suppose we want to find products whose title contains the words
+            <em>running shoes</em>.
+          </p>
+
+          <p>
+            In Elasticsearch, text searches are usually done using a
+            <strong>match query</strong>.
+          </p>
+
+<pre><code>
+{
+  "query": {
+    "match": {
+      "title": "running shoes"
+    }
+  }
+}
+</code></pre>
+
+          <p>
+            The match query analyzes the text and finds documents containing
+            similar words.
+          </p>
+
+          <p>
+            For example, the query above could match documents like:
+          </p>
+
+          <ul>
+            <li>"title": "Running Shoes"</li>
+            <li>"title": "Lightweight Running Shoes"</li>
+            <li>"title": "Shoes for Running"</li>
+          </ul>
+
+          <p>
+            This works because Elasticsearch breaks text into searchable tokens. So while searching for running shoes, it will break this into two tokens:
+            
+            "running" and "shoes", and find documents that contain either of these tokens in the title.
+            <br>
+            <br>
+            As you remember from the previous article, Elasticsearch uses an inverted index to quickly find the documents that contain these tokens.
+            <br>
+            <br>
+            Say the inverted index looks like this:
+            <pre><code>
+            "running" → [doc1, doc2]
+            "shoes" → [doc1, doc2, doc3]
+            </code></pre>
+            Then the match query will find documents 1, 2, and 3 because they contain either "running" or "shoes".
+          </p>
+        </section>
+
+        <section class="stack">
+          <h2>Step 2 — Combining Conditions with a Bool Query</h2>
+
+          <p>
+            In real applications we rarely search using only one condition.
+          </p>
+
+          <p>
+            We usually want to combine multiple conditions together.
+          </p>
+
+          <p>
+            Elasticsearch provides a special query called the
+            <strong>bool query</strong> for this purpose.
+          </p>
+
+          <p>
+            A bool query allows us to combine conditions using logic similar to
+            AND / OR in SQL.
+          </p>
+
+<pre><code>
+{
+  "query": {
+    "bool": {
+      "must": [
+        { "match": { "title": "running shoes" } }
+      ]
+    }
+  }
+}
+</code></pre>
+
+          <p>
+            The <strong>must</strong> clause means the condition must match for
+            a document to be included in the results.
+          </p>
+        </section>
+
+        <section class="stack">
+          <h2>Step 3 — Adding Exact Filters</h2>
+
+          <p>
+            Now suppose we only want products from the brand Nike.
+          </p>
+
+          <p>
+            For exact matches, Elasticsearch uses a
+            <strong>term query</strong>.
+          </p>
+
+<pre><code>
+{
+  "term": {
+    "brand": "Nike"
+  }
+}
+</code></pre>
+
+          <p>
+            Instead of placing this inside <strong>must</strong>, we typically
+            place exact conditions inside a <strong>filter</strong> clause.
+          </p>
+
+<pre><code>
+{
+  "query": {
+    "bool": {
+      "must": [
+        { "match": { "title": "running shoes" } }
+      ],
+      "filter": [
+        { "term": { "brand": "Nike" } }
+      ]
+    }
+  }
+}
+</code></pre>
+
+          <p>
+            Filters are faster because they do not compute relevance scores.
+          </p>
+        </section>
+
+        <section class="stack">
+          <h2>Step 4 — Filtering by Price</h2>
+
+          <p>
+            Suppose we want products whose price is between 1500 and 3000.
+          </p>
+
+          <p>
+            Elasticsearch provides a <strong>range query</strong> for numeric
+            fields.
+          </p>
+
+<pre><code>
+{
+  "range": {
+    "price": {
+      "gte": 1500,
+      "lte": 3000
+    }
+  }
+}
+</code></pre>
+
+          <p>
+            Here:
+          </p>
+
+          <ul>
+            <li>gte means "greater than or equal"</li>
+            <li>lte means "less than or equal"</li>
+          </ul>
+
+          <p>
+            We can add this to our filter list:
+          </p>
+
+<pre><code>
+{
+  "query": {
+    "bool": {
+      "must": [
+        { "match": { "title": "running shoes" } }
+      ],
+      "filter": [
+        { "term": { "brand": "Nike" } },
+        { "range": { "price": { "gte": 1500, "lte": 3000 } } }
+      ]
+    }
+  }
+}
+</code></pre>
+        </section>
+
+        <section class="stack">
+          <h2>Step 5 — Multiple Possible Values</h2>
+
+          <p>
+            Finally, imagine we want products available in either Bengaluru or
+            Delhi.
+          </p>
+
+          <p>
+            For this we can use a <strong>terms query</strong>.
+          </p>
+
+<pre><code>
+{
+  "terms": {
+    "city": ["Bengaluru", "New Delhi"]
+  }
+}
+</code></pre>
+
+          <p>
+            This query matches documents where the city field contains any of
+            the listed values.
+          </p>
+        </section>
+
+        <section class="stack">
+          <h2>The Final Query</h2>
+
+          <p>
+            Putting everything together, we get the following query:
+          </p>
+
+<pre><code>
+{
+  "query": {
+    "bool": {
+      "must": [
+        { "match": { "title": "running shoes" } }
+      ],
+      "filter": [
+        { "term": { "brand": "Nike" } },
+        { "range": { "price": { "gte": 1500, "lte": 3000 } } },
+        { "terms": { "city": ["Bengaluru", "New Delhi"] } }
+      ]
+    }
+  }
+}
+</code></pre>
+
+          <p>
+            In plain English, this query means:
+          </p>
+
+          <p>
+            <em>
+              Find products related to "running shoes", where the brand is
+              Nike, the price is between 1500 and 3000, and the city is either
+              Bengaluru or New Delhi.
+            </em>
+          </p>
+        </section>
+
+        <section class="stack">
+          <h2>A Simple Way to Think About Elasticsearch Queries</h2>
+
+          <p>
+            The easiest way to understand Elasticsearch queries is to think of
+            them as a process of <strong>gradually narrowing down
+            documents</strong>.
+          </p>
+
+          <p>
+            First we search broadly using text queries, and then we apply
+            filters that progressively reduce the candidate documents.
+          </p>
+
+          <p>
+            Once you understand this pattern, writing queries in Elasticsearch
+            becomes much easier.
+          </p>
+        </section>
+
+        <a href="../blogs.html" class="button button--ghost">← Back to Blog</a>
+      </article>
+    </main>
+
+    <footer class="site-footer" id="site-footer"></footer>
+
+    <script src="../main.js"></script>
+  </body>
+</html>
