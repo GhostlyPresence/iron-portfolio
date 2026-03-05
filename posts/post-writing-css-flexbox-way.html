@@ -33,7 +33,7 @@
 
         <figure class="post-hero">
           <img
-            src="../images/jiraiya.jpg"
+            src="./images/post-css-flexbox/cover.png"
             alt="Fantasy illustration used as a companion image for this article"
             class="post-hero__image"
           />
@@ -59,45 +59,46 @@
 &lt;/div&gt;</code></pre>
           <p>This structure will help tremendously when you apply CSS to it.</p>
 
-          <figure class="post-hero">
+          <figure class="post-child">
             <img
-              src="../images/jiraiya.jpg"
+              src="./images/post-css-flexbox/image1.1.webp"
               alt="Illustration for hierarchy section"
-              class="post-hero__image"
+              class="post-child__image"
             />
           </figure>
         </section>
 
         <section class="stack">
           <h2>Adding Background Color for Better Visualization</h2>
+            <figure class="post-child">
+            <img
+              src="./images/post-css-flexbox/image1.2.webp"
+              alt="Illustration for hierarchy section"
+              class="post-child__image"
+            />
+          </figure>
+
           <p>Here I have added different background colors to all the components. Now you can see clearly how much space each one is taking and how it is aligned with respect to its parent container.</p>
           <p><em>Note: I have added padding so you can see more clearly, but you don't need to do that after you understand the structure.</em></p>
           <pre><code>.nav-bar {
-  background-color: green;
-  padding: 5px;
-}
+          background-color: green;
+          padding: 5px;
+        }
 
-.logo {
-  background-color: red;
-}
+        .logo {
+          background-color: red;
+        }
 
-.nav-links-container {
-  background-color: blue;
-  padding: 10px;
-}
+        .nav-links-container {
+          background-color: blue;
+          padding: 10px;
+        }
 
-.nav-link {
-  background-color: yellow;
-  margin: 2px;
-}</code></pre>
+        .nav-link {
+          background-color: yellow;
+          margin: 2px;
+        }</code></pre>
 
-          <figure class="post-hero">
-            <img
-              src="../images/jiraiya.jpg"
-              alt="Illustration for background color section"
-              class="post-hero__image"
-            />
-          </figure>
         </section>
 
         <section class="stack">
@@ -110,11 +111,11 @@
 /* To change the direction to vertical, add:
    flex-direction: column; */</code></pre>
 
-          <figure class="post-hero">
+            <figure class="post-child">
             <img
-              src="../images/jiraiya.jpg"
-              alt="Illustration for flexbox section"
-              class="post-hero__image"
+              src="./images/post-css-flexbox/image1.3.webp"
+              alt="Illustration for hierarchy section"
+              class="post-child__image"
             />
           </figure>
         </section>
@@ -129,11 +130,11 @@
 }
 /* Change the value to 2:1 to see how it affects the layout */</code></pre>
 
-          <figure class="post-hero">
+            <figure class="post-child">
             <img
-              src="../images/jiraiya.jpg"
-              alt="Illustration for flex property section"
-              class="post-hero__image"
+              src="./images/post-css-flexbox/image1.4.webp"
+              alt="Illustration for hierarchy section"
+              class="post-child__image"
             />
           </figure>
         </section>
@@ -145,6 +146,14 @@
             <li><strong>Main-axis:</strong> The axis along which child components are aligned</li>
             <li><strong>Cross-axis:</strong> The perpendicular axis</li>
           </ul>
+
+          <figure class="post-child">
+            <img
+              src="./images/post-css-flexbox/image1.6.webp"
+              alt="Illustration for hierarchy section"
+              class="post-child__image"
+            />
+          </figure>
           
           <h3>Aligning Along the Main-Axis</h3>
           <p>To align child components along the main-axis, use <code>justify-content: center</code>:</p>
@@ -152,11 +161,28 @@
   justify-content: center;
 }</code></pre>
 
+          <figure class="post-child">
+            <img
+              src="./images/post-css-flexbox/image1.5.webp"
+              alt="Illustration for hierarchy section"
+              class="post-child__image"
+            />
+          </figure>
+
+
           <h3>Using Space-Around</h3>
           <p>To distribute nav-links more efficiently, use <code>justify-content: space-around</code>:</p>
           <pre><code>.nav-links-container {
   justify-content: space-around;
 }</code></pre>
+
+          <figure class="post-child">
+            <img
+              src="./images/post-css-flexbox/image1.7.webp"
+              alt="Illustration for hierarchy section"
+              class="post-child__image"
+            />
+          </figure>
           <p>There are more values that can be given to <code>justify-content</code> that you can research on your own.</p>
 
           <h3>Aligning Along the Cross-Axis</h3>
@@ -167,11 +193,19 @@
 }
 }</code></pre>
 
-          <figure class="post-hero">
+          <figure class="post-child">
             <img
-              src="../images/jiraiya.jpg"
-              alt="Illustration for alignment section"
-              class="post-hero__image"
+              src="./images/post-css-flexbox/image1.8.webp"
+              alt="Illustration for hierarchy section"
+              class="post-child__image"
+            />
+          </figure>
+          Now you can remove the background colors and padding, and you will have a perfectly aligned nav bar.
+          <figure class="post-child">
+            <img
+              src="./images/post-css-flexbox/image1.9.webp"
+              alt="Illustration for hierarchy section"
+              class="post-child__image"
             />
           </figure>
         </section>
@@ -186,12 +220,13 @@
   }
 }</code></pre>
 
-          <figure class="post-hero">
+            <figure class="post-child">
             <img
-              src="../images/jiraiya.jpg"
-              alt="Illustration for media queries section"
-              class="post-hero__image"
+              src="./images/post-css-flexbox/image1.10.webp"
+              alt="Illustration for hierarchy section"
+              class="post-child__image"
             />
+          </figure>
           </figure>
         </section>
 

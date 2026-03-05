@@ -28,7 +28,8 @@
       </header>
 
       <figure class="post-hero">
-        <img src="../images/jiraiya.jpg" alt="Illustration used as a companion image for this article"
+        <img src="./images/post-elastic-search/cover.png" 
+        alt="Illustration used as a companion image for this article"
           class="post-hero__image" />
       </figure>
 
@@ -366,7 +367,11 @@
 
         <p>
           Matches in shorter fields often receive slightly higher scores because the
-          terms are more concentrated.
+          terms are more concentrated. 
+          <br><br>
+          That means that even if "running shoes" was there in both titles: "Best Lightweight Running Shoes" and "Running Shoes for Marathon Training",
+          the first one would get a higher score because the title is shorter and the terms are more concentrated. 
+          <br><br>If the terms that you are searching for make up a larger portion of the text, Elasticsearch considers it a stronger match.
         </p>
         
 
