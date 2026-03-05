@@ -46,7 +46,7 @@
           <p>
             In the first part of this series we covered the basics of
             Elasticsearch — documents, indices, inverted indices, and how
-            search works at a conceptual level.
+            search works at a conceptual level. And then we took a little detour on how elastic search query works.
           </p>
 
           <p>
@@ -104,35 +104,31 @@
           <p>
             High-level queries written using Elasticsearch’s Query DSL are
             internally rewritten into lower-level Lucene queries.
-          </p>
 
-          <p>
             For example, a simple match query:
           </p>
 
-<pre>
-{
-  "match": {
-    "title": "running shoes"
-  }
-}
-</pre>
+          <pre>
+          {
+            "match": {
+              "title": "running shoes"
+            }
+          }
+          </pre>
 
           <p>
             might be rewritten internally into something closer to a boolean
             query containing term queries for each token:
           </p>
 
-<pre>
-title:running OR title:shoes
-</pre>
+          <pre>
+          title:running OR title:shoes
+          </pre>
 
           <p>
             This transformation allows Elasticsearch to operate directly on the
             inverted index.
-          </p>
 
-          <p>
             Query rewriting also enables other optimizations such as collapsing
             filters and eliminating unnecessary scoring steps.
           </p>
@@ -270,9 +266,7 @@ title:running OR title:shoes
           <p>
             Elasticsearch is designed to run across multiple machines, so a
             single query must often be executed across many shards.
-          </p>
-
-          <p>
+            <br>
             Search execution happens in two main phases.
           </p>
 
@@ -289,9 +283,7 @@ title:running OR title:shoes
           <p>
             Once the top results are known, the coordinating node asks the
             relevant shards to return the full document contents.
-          </p>
-
-          <p>
+          <br>
             This two-phase design minimizes network traffic and ensures that
             only the most relevant documents are retrieved.
           </p>
@@ -303,9 +295,7 @@ title:running OR title:shoes
           <p>
             To scale horizontally, Elasticsearch divides each index into
             <strong>primary shards</strong>.
-          </p>
-
-          <p>
+          <br>
             Each shard contains a subset of the documents in the index. Queries
             can therefore run in parallel across shards.
           </p>
