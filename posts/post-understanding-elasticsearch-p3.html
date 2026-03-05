@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>What Happens When You Write a Document to Elasticsearch · Blog · Manas S.</title>
+    <link rel="stylesheet" href="../styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Marcellus&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/png" href="../images/logo.png">
+  </head>
+
+  <body
+    class="page"
+    data-page="blog-post"
+    data-footer-note="Notes on search systems and distributed things."
+  >
+    <header class="site-header" id="site-header"></header>
+
+    <main class="page__main">
+      <article class="stack">
+
+        <header class="page-header">
+          <p class="page-header__eyebrow">Engineering Notes · 2026 · 12 min read</p>
+          <h1 class="page-header__title">
+            What Happens When You Write a Document to Elasticsearch?
+          </h1>
+          <p class="page-header__subtitle">
+            A step-by-step walkthrough of the Elasticsearch write path.
+          </p>
+        </header>
+
+        <figure class="post-hero">
+          <img
+            src="../images/jiraiya.jpg"
+            alt="Illustration used as a companion image for this article"
+            class="post-hero__image"
+          />
+        </figure>
+
+        <section class="stack">
+
+          <h2>The Journey of a Document</h2>
+
+          <p>
+            When we send a document to Elasticsearch, the process looks simple.
+            You send a JSON document, Elasticsearch responds with <em>"created"</em>,
+            and a moment later the document becomes searchable.<br><br>
+
+            But behind the scenes, several carefully designed steps happen to make
+            the system both <strong>fast</strong> and <strong>safe</strong>.<br><br>
+
+            Elasticsearch must balance three competing goals:
+            <br>• Writes must be fast.
+            <br>• Data must not be lost if a node crashes.
+            <br>• Documents must become searchable quickly.
+            <br><br>
+
+            To achieve this, Elasticsearch uses a combination of memory buffers,
+            transaction logs, and disk segments.
+          </p>
+
+        </section>
+
+
+        <section class="stack">
+
+          <h2>The Example Document</h2>
+
+          <p>
+            Imagine we send the following document to an index called
+            <strong>products</strong>.
+          </p>
+
+<pre>
+POST /products/_doc
+
+{
+  "title": "Running Shoes",
+  "brand": "Nike",
+  "price": 1999,
+  "city": "Bengaluru",
+  "in_stock": true
+}
+</pre>
+
+          <p>
+            Our goal is simple: store this document and make it searchable.<br><br>
+            Let’s follow the document as it travels through the Elasticsearch system.
+          </p>
+
+        </section>
+
+
+        <section class="stack">
+
+          <h2>Step 1 — The Request Reaches a Node</h2>
+
+          <p>
+            An Elasticsearch cluster contains multiple nodes.
+            When a client sends a request, it can send it to <strong>any node</strong> in the cluster.<br><br>
+
+            The node that receives the request becomes the
+            <strong>coordinating node</strong>. Its job is to figure out where the document
+            should actually be stored.<br><br>
+
+            Elasticsearch determines the correct shard using a hash of the document ID.
+            Once the shard is identified, the request is forwarded to the node that
+            owns the <strong>primary shard</strong>.
+          </p>
+
+        </section>
+
+
+        <section class="stack">
+
+          <h2>Step 2 — The Primary Shard Receives the Write</h2>
+
+          <p>
+            Each Elasticsearch index is divided into pieces called
+            <strong>primary shards</strong>.<br><br>
+
+            Every document belongs to exactly one primary shard.
+            When the request reaches the node that owns that shard,
+            the indexing process begins.<br><br>
+
+            But Elasticsearch does not immediately write the document to the
+            searchable index on disk. Disk writes are slow, and doing them for
+            every document would make indexing painfully inefficient.
+          </p>
+
+        </section>
+
+
+        <section class="stack">
+
+          <h2>Step 3 — Writing to the In-Memory Indexing Buffer</h2>
+
+          <p>
+            Instead of writing directly to disk, Elasticsearch first places the
+            document in an <strong>in-memory indexing buffer</strong>.<br><br>
+
+            At this stage the document is analyzed. Text fields are tokenized so
+            they can later be searched efficiently.<br><br>
+
+            For example:
+          </p>
+
+<pre>
+"title": "Running Shoes"
+</pre>
+
+          <p>
+            might become tokens like:
+          </p>
+
+<pre>
+running
+shoes
+</pre>
+
+          <p>
+            These tokens will eventually become part of the inverted index.
+            For now they live in memory waiting to be written to disk.
+          </p>
+
+        </section>
+
+
+        <section class="stack">
+
+          <h2>Step 4 — Writing to the Translog</h2>
+
+          <p>
+            Memory is fast, but it has one big weakness: it disappears if the
+            node crashes.<br><br>
+
+            To prevent data loss, Elasticsearch writes every indexing operation
+            to a <strong>transaction log</strong>, usually called the
+            <strong>translog</strong>.<br><br>
+
+            The translog lives on disk and records every write operation that
+            happens on the shard.<br><br>
+
+            If the node crashes before the in-memory data is flushed to disk,
+            Elasticsearch can simply replay the translog and recover the lost
+            operations.<br><br>
+
+            You can think of the translog as Elasticsearch quietly saying:
+            <br><em>"I wrote this down just in case."</em>
+          </p>
+
+        </section>
+
+
+        <section class="stack">
+
+          <h2>Step 5 — Refresh and Segment Creation</h2>
+
+          <p>
+            At this point the document exists in memory and inside the translog,
+            but it still is not searchable.<br><br>
+
+            For the document to become searchable, Elasticsearch must convert the
+            in-memory data into a <strong>segment</strong>.<br><br>
+
+            Segments are immutable pieces of the index stored on disk.
+            Each segment contains an inverted index for the documents it holds.<br><br>
+
+            Elasticsearch performs a <strong>refresh</strong> operation periodically
+            (usually every second). During refresh, the data in the indexing buffer
+            is written into a new segment and opened for search.<br><br>
+
+            This is why Elasticsearch is described as
+            <strong>near real-time</strong> rather than real-time.
+          </p>
+
+        </section>
+
+
+        <section class="stack">
+
+          <h2>Step 6 — Replication</h2>
+
+          <p>
+            After the primary shard processes the write, the operation is sent to
+            <strong>replica shards</strong>.<br><br>
+
+            Replica shards store copies of the data on other nodes in the cluster.
+            They serve two purposes:
+            <br>• Fault tolerance
+            <br>• Increased search throughput<br><br>
+
+            Once the replicas acknowledge the operation, Elasticsearch confirms
+            that the document has been successfully indexed.
+          </p>
+
+        </section>
+
+
+        <section class="stack">
+
+          <h2>The Complete Write Path</h2>
+
+<pre>
+Client Request
+      ↓
+Coordinating Node
+      ↓
+Primary Shard
+      ↓
+In-Memory Indexing Buffer
+      ↓
+Translog (durability)
+      ↓
+Refresh → Segment Creation
+      ↓
+Replication to Replica Shards
+      ↓
+Document becomes searchable
+</pre>
+
+          <p>
+            A lot happens behind the scenes for something that feels as simple
+            as writing a JSON document.<br><br>
+
+            But these steps allow Elasticsearch to achieve a balance that is
+            surprisingly hard in distributed systems: fast writes, quick search
+            visibility, and durability against crashes.<br><br>
+
+            In other words, Elasticsearch is doing quite a bit of careful work
+            behind the curtain — and thankfully it does it in about a second.
+          </p>
+
+        </section>
+
+
+        <a href="../blogs.html" class="button button--ghost">← Back to Blog</a>
+
+      </article>
+    </main>
+
+    <footer class="site-footer" id="site-footer"></footer>
+
+    <script src="../main.js"></script>
+  </body>
+</html>

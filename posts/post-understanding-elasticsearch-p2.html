@@ -152,18 +152,18 @@
             For example:
           </p>
 
-<pre>
-{
-  "bool": {
-    "must": [
-      { "match": { "title": "shoes" } }
-    ],
-    "filter": [
-      { "term": { "brand": "Nike" } }
-    ]
-  }
-}
-</pre>
+        <pre>
+        {
+          "bool": {
+            "must": [
+              { "match": { "title": "shoes" } }
+            ],
+            "filter": [
+              { "term": { "brand": "Nike" } }
+            ]
+          }
+        }
+        </pre>
 
           <p>
             In this case:
@@ -235,29 +235,25 @@
           <p>
             Elasticsearch achieves near real-time search using a structure
             called <strong>segments</strong>.
-          </p>
-
-          <p>
+         <br>
             Each shard is composed of multiple immutable segments. When
             documents are indexed, they are first written to in-memory buffers
             and the transaction log.
-          </p>
-
-          <p>
+          <br><br>
             During a <strong>refresh</strong> operation, these buffers are
             converted into a new segment that becomes searchable.
-          </p>
-
-          <p>
+          <br>
             This is why Elasticsearch is described as
             <em>near real-time</em> rather than strictly real-time.
-          </p>
-
-          <p>
+          <br><br>
             Over time many small segments accumulate, so Elasticsearch
             periodically merges them into larger ones. This process improves
             search performance and removes deleted documents.
           </p>
+          <p>
+            Its okay if you don't understand this just yet. We have discussed the document journey in the next article.
+          </p>
+
         </section>
 
         <section class="stack">

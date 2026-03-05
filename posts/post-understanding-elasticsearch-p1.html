@@ -165,8 +165,8 @@
           <pre>
 
         {
-          "city": "New Delhi",          --- this field is mapped as keyword data type
-          "description": "Capital of India"    --- this field is mapped as text data type
+          "city": "New Delhi",                  ---- this field is mapped as keyword data type
+          "description": "Capital of India"     ---- this field is mapped as text data type
         }
           </pre>
 
@@ -175,10 +175,10 @@
           </p>
 
           <pre>
-          "New Delhi" --> [doc1] --> The two words will be indexed together as a single token "New Delhi"
-          "Capital" --> [doc1] --> The word "Capital" will be indexed as a token
-          "of" --> [doc1] --> The word "of" will be indexed as a token
-          "India" --> [doc1] --> The word "India" will be indexed as a token
+          "New Delhi" --> [doc1]    --> The two words will be indexed together as a single token "New Delhi"
+          "Capital" --> [doc1]      --> The word "Capital" will be indexed as a token
+          "of" --> [doc1]           --> The word "of" will be indexed as a token
+          "India" --> [doc1]        --> The word "India" will be indexed as a token
           </pre>
 
           While searching, if we search using a field that is a keyword, it has to be an exact match. 
