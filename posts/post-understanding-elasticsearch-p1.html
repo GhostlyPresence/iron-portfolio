@@ -92,12 +92,12 @@
           </p>
 
           <pre>
-{
-  "title": "Running Shoes",
-  "brand": "Nike",
-  "price": 1999,
-  "in_stock": true
-}
+        {
+          "title": "Running Shoes",
+          "brand": "Nike",
+          "price": 1999,
+          "in_stock": true
+        }
           </pre>
 
           <p>
@@ -124,9 +124,9 @@
           <p>For example:</p>
 
           <pre>
-running → [doc1, doc2]
-shoes   → [doc1, doc2, doc3]
-leather → [doc3]
+          running → [doc1, doc2]
+          shoes   → [doc1, doc2, doc3]
+          leather → [doc3]
           </pre>
 
           <p>
@@ -151,29 +151,43 @@ leather → [doc3]
           <p>
             A <strong>keyword</strong> field stores the value exactly as it is.
             It is useful for filtering, sorting, and aggregations.
-          </p>
-
-          <p>
+         <br>
             A <strong>text</strong> field, on the other hand, is analyzed and
             broken into searchable tokens. This makes it useful for full-text
             search.
           </p>
 
           <p>
-            For example, the sentence:
+            Say we have the follwing document:
+            
           </p>
 
           <pre>
-"user bought two shoes"
+
+        {
+          "city": "New Delhi",          --- this field is mapped as keyword data type
+          "description": "Capital of India"    --- this field is mapped as text data type
+        }
           </pre>
 
           <p>
-            might be indexed as the tokens:
+          The tokens generated will look like this:
           </p>
 
           <pre>
-user, bought, two, shoes
+          "New Delhi" --> [doc1] --> The two words will be indexed together as a single token "New Delhi"
+          "Capital" --> [doc1] --> The word "Capital" will be indexed as a token
+          "of" --> [doc1] --> The word "of" will be indexed as a token
+          "India" --> [doc1] --> The word "India" will be indexed as a token
           </pre>
+
+          While searching, if we search using a field that is a keyword, it has to be an exact match. 
+          So if we search for "New Delhi" in the city field, it will match [doc1].
+          <br>
+          But if we search for "Delhi" in the city field, it will not match [doc1] because the city field is indexed as a keyword and requires an exact match.
+
+          <br><br>
+          But for the description field, if we search for "Capital", it will match [doc1] because the description field is indexed as text and is analyzed into tokens.
         </section>
 
         <section class="stack">
