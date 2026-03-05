@@ -108,22 +108,22 @@
             For example, a simple match query:
           </p>
 
-          <pre>
+          <pre><code>
           {
             "match": {
               "title": "running shoes"
             }
           }
-          </pre>
+          </code></pre>
 
           <p>
             might be rewritten internally into something closer to a boolean
             query containing term queries for each token:
           </p>
 
-          <pre>
+          <pre><code>
           title:running OR title:shoes
-          </pre>
+          </code></pre>
 
           <p>
             This transformation allows Elasticsearch to operate directly on the
@@ -152,7 +152,7 @@
             For example:
           </p>
 
-        <pre>
+        <pre><code>
         {
           "bool": {
             "must": [
@@ -163,7 +163,7 @@
             ]
           }
         }
-        </pre>
+        </code></pre>
 
           <p>
             In this case:
@@ -206,13 +206,13 @@
             Conceptually, doc values look like this:
           </p>
 
-          <pre>
+          <pre><code>
           DocID | price
           -------------
           1     | 1200
           2     | 900
           3     | 3000
-          </pre>
+          </code></pre>
 
           
             This structure enables efficient operations such as:

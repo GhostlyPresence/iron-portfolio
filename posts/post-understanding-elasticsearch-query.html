@@ -291,7 +291,7 @@
           Documents with higher scores appear earlier in the results.
         </p>
 
-        <pre>
+        <pre><code>
         {
           "hits": [
             {
@@ -308,7 +308,7 @@
             }
           ]
         }
-        </pre>
+        </code></pre>
 
         <p>
           The <code>_score</code> field is the relevance score. Elasticsearch sorts
@@ -337,11 +337,11 @@
           Elasticsearch assigns scores to each document to rank them by relevance.
         </p>
 
-        <pre>
+        <pre><code>
         Best Lightweight Running Shoes      score = 4.1
         Running Shoes for Marathon Training score = 3.6
         Comfortable Shoes for Walking       score = 0.9
-        </pre>
+        </code></pre>
 
         <p>
           The documents that match the query terms more closely receive higher
@@ -403,13 +403,13 @@
           For example:
         </p>
 
-        <pre>
+        <pre><code>
         {
           "term": {
             "brand": "Nike"
           }
         }
-        </pre>
+        </code></pre>
 
         <p>
           This filter simply checks whether the brand is Nike. It does not influence

@@ -82,14 +82,14 @@
           A document is simply a JSON object that represents a piece of data.
         </p>
 
-        <pre>
+        <pre><code>
         {
           "title": "Running Shoes",
           "brand": "Nike",
           "price": 1999,
           "in_stock": true
         }
-          </pre>
+          </code></pre>
 
         <p>
           Documents are stored inside something called an
@@ -114,11 +114,11 @@
 
         <p>For example:</p>
 
-        <pre>
+        <pre><code>
           running → [doc1, doc2]
           shoes   → [doc1, doc2, doc3]
           leather → [doc3]
-          </pre>
+          </code></pre>
 
         <p>
           When someone searches for “running shoes”, Elasticsearch simply
@@ -153,23 +153,23 @@
 
         </p>
 
-        <pre>
+        <pre><code>
 {
   "city": "New Delhi",                  ---- this field is mapped as keyword data type
   "description": "Capital of India"     ---- this field is mapped as text data type
 }
-          </pre>
+          </code></pre>
 
         <p>
           The tokens generated will look like this:
         </p>
 
-        <pre>
+        <pre><code>
 "New Delhi" --> [doc1]          --> The two words will be indexed together as a single token "New Delhi"
 "Capital"   --> [doc1]          --> The word "Capital" will be indexed as a token
 "of"        --> [doc1]          --> The word "of" will be indexed as a token
 "India"     --> [doc1]          --> The word "India" will be indexed as a token
-          </pre>
+          </code></pre>
 
         While searching, if we search using a field that is a keyword, it has to be an exact match.
         So if we search for "New Delhi" in the city field, it will match [doc1].
@@ -199,23 +199,23 @@
           Typical queries:
           <br>
 
-        <pre>price > 50
+        <pre><code>price > 50
 price between 50 and 200
-        </pre>
+        </code></pre>
 
         If Elasticsearch used a normal inverted index, it would need entries like:
-        <pre>
+        <pre><code>
 100 → doc1
 101 → doc2
 102 → doc3
-          </pre>
+          </code></pre>
 
           That works for exact matches, but it is terrible for ranges.
           <p>
             Example query:
-<pre>
+<pre><code>
 price between 50 and 200
-</pre>
+</code></pre>
 
 It would need to scan 150 index entries.
 
