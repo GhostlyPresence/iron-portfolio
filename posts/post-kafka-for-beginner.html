@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Kafka Explained From First Principles · Blog · Manas S.</title>
+
+<link rel="stylesheet" href="../styles.css" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&display=swap" rel="stylesheet"/>
+
+<link rel="icon" type="image/png" href="../images/logo.png">
+
+</head>
+
+<body class="page" data-page="blog-post" data-footer-note="Notes on distributed systems.">
+
+<header class="site-header" id="site-header"></header>
+
+<main class="page__main">
+
+<article class="stack">
+
+<header class="page-header">
+
+<p class="page-header__eyebrow">
+Distributed Systems · Kafka · 15 min read
+</p>
+
+<h1 class="page-header__title">
+Kafka Explained From First Principles
+</h1>
+
+<p class="page-header__subtitle">
+A beginner-friendly guide to message queues, Kafka architecture, and how modern systems move massive amounts of data reliably.
+</p>
+
+</header>
+
+<figure class="post-hero">
+        <img src="./images/post-kafka/cover.webp"
+          alt="Illustration used as a companion image for the Kafka article" class="post-hero__image" />
+      </figure>
+
+
+
+<section class="stack">
+
+<h2>Part 1 — Beginner: Understanding the Basics</h2>
+
+<h3>The Problem: Systems Need to Talk</h3>
+
+Modern software systems rarely live alone.
+
+A typical application might have:
+
+<ul>
+<li>API servers</li>
+<li>payment services</li>
+<li>notification systems</li>
+<li>analytics pipelines</li>
+<li>databases</li>
+</ul>
+
+Every one of these systems needs to exchange information.
+
+Example:
+
+<pre><code>
+User places order
+    ↓
+Payment service processes payment
+    ↓
+Inventory service updates stock
+    ↓
+Notification service sends email
+    ↓
+Analytics pipeline records event
+</code></pre>
+
+If each system called the other directly using APIs, the architecture becomes fragile.
+
+If one system is slow or down, everything else breaks.
+
+<p><strong><em>
+This is where message queues enter the story.
+</em></strong>
+</p>
+
+
+
+<h3>What Is a Message Queue?</h3>
+
+A message queue is simply a system where:
+
+<ul>
+<li>one application sends messages</li>
+<li>another application processes them later</li>
+</ul>
+
+Instead of direct communication:
+
+<pre><code>
+Service A → API → Service B
+</code></pre>
+
+We use:
+
+<pre><code>
+Service A → Queue → Service B
+</code></pre>
+
+The queue stores the message safely until the consumer processes it.
+
+Think of it like a mailbox.
+
+You drop a letter in the mailbox.  
+The recipient checks it when they are ready.
+
+Much less shouting across the street.
+
+<figure class="post-child">
+            <img
+              src="./images/post-kafka/image3.1.webp"
+              alt="Illustration for hierarchy section"
+              class="post-child__image"
+            />
+          </figure>
+
+
+<h3>Popular Message Queues Used in Industry</h3>
+
+Different companies use different systems depending on scale.
+
+<ul>
+<li>RabbitMQ — classic message broker</li>
+<li>Apache Kafka — distributed streaming platform</li>
+<li>Amazon SQS — managed cloud queue</li>
+<li>Google Pub/Sub — cloud event streaming</li>
+<li>NATS — lightweight messaging system</li>
+</ul>
+
+<p><strong>Kafka became popular because it handles <em>extremely large data streams efficiently</em>.</strong></p>
+
+
+
+<h3>Queue vs API Communication</h3>
+
+<p>
+Understanding this difference is important.
+
+API communication is <strong> synchronous </strong>.
+</p>
+
+<pre><code>
+Service A → API request → Service B
+(wait)
+Service B responds
+</code></pre>
+
+<p>Queue communication is <strong>asynchronous</strong>.</p>
+
+<pre><code>
+Service A → message queue
+Service B → processes message later
+</code></pre>
+
+Benefits:
+
+<ul>
+<li>services are loosely coupled</li>
+<li>systems can scale independently</li>
+<li>temporary failures do not break the pipeline</li>
+</ul>
+
+In simple terms: APIs demand immediate attention.  
+Queues politely wait their turn.
+
+
+
+<h3>What Is Kafka?</h3>
+
+<p>Kafka is a <strong>distributed event streaming platform</strong>.</p>
+
+That sounds complicated, but the idea is simple.
+
+Kafka is designed to:
+
+<ul>
+<li>accept messages from producers</li>
+<li>store them reliably</li>
+<li>deliver them to consumers</li>
+</ul>
+
+<p>Kafka became popular because it handles <strong><em>extremely large data streams efficiently</em></strong>.</p>
+
+Companies using Kafka:
+
+<ul>
+<li>LinkedIn</li>
+<li>Netflix</li>
+<li>Uber</li>
+<li>Spotify</li>
+<li>Airbnb</li>
+</ul>
+
+Kafka pipelines process millions of events per second.
+
+Examples of events:
+
+<ul>
+<li>user clicks</li>
+<li>orders</li>
+<li>payments</li>
+<li>logs</li>
+<li>sensor readings</li>
+</ul>
+
+
+
+<h3>The Kafka Cluster</h3>
+<p>
+
+Kafka runs on multiple machines.
+
+This group is called a <strong>Kafka cluster</strong>.
+
+Each server inside the cluster is called a <strong>broker</strong>.
+
+</p>
+
+<pre><code>
+Kafka Cluster
+
+Broker 1
+Broker 2
+Broker 3
+</code></pre>
+
+Reasons for using multiple brokers:
+
+<ul>
+<li>higher throughput</li>
+<li>fault tolerance</li>
+<li>horizontal scalability</li>
+</ul>
+
+If one broker crashes, others continue serving data.
+
+Kafka is built for systems where downtime is unacceptable.
+
+
+
+<h3>Topics: Categories of Data</h3>
+
+<p>Messages in Kafka are stored inside <strong>topics</strong>.A topic is simply a category of events.</p>
+
+
+
+Example topics:
+
+<ul>
+<li>orders</li>
+<li>payments</li>
+<li>user-signups</li>
+<li>click-events</li>
+<li>logs</li>
+</ul>
+
+Producers write to topics.  
+Consumers read from topics.
+
+
+
+<h3>Partitions: The Key to Kafka's Scalability</h3>
+<p>
+
+Each topic is divided into <strong>partitions</strong>.
+
+Partitions allow multiple consumers to process messages in parallel.
+</p>
+
+Example:
+
+<pre><code>
+Topic: orders
+
+Partition 0
+Partition 1
+Partition 2
+Partition 3
+</code></pre>
+
+Messages are distributed across partitions.
+
+Benefits:
+
+<ul>
+<li>parallel processing</li>
+<li>horizontal scalability</li>
+<li>high throughput</li>
+</ul>
+
+Important rule:
+
+<p>
+<strong><em>Ordering is guaranteed only within a partition.</em></strong>
+</p>
+
+
+
+<h3>Producers</h3>
+
+Producers send messages into Kafka.
+
+Example producer code conceptually:
+
+<pre><code>
+producer.send(topic="orders",
+              key="order123",
+              value="itemA, quantity=2")
+</code></pre>
+
+<p>
+The <strong>key</strong> helps determine which partition the message goes to.
+</p>
+
+Kafka uses:
+
+<pre><code>
+partition = hash(key) % number_of_partitions
+</code></pre>
+
+This ensures messages with the same key land in the same partition.
+
+
+
+<h3>Consumers</h3>
+<p>
+
+Consumers read messages from Kafka.
+
+Consumers <strong>poll</strong> Kafka instead of receiving pushed messages.
+</p>
+
+<pre><code>
+consumer.poll()
+</code></pre>
+
+Why polling?
+
+Because consumers control the speed of processing.
+
+Kafka never overwhelms slow consumers.
+
+Very polite behaviour.
+
+
+
+<h3>Consumer Groups</h3>
+
+Consumers often work in teams.
+
+<p>
+A <strong>consumer group</strong> is a set of consumers sharing the work. 
+
+</p>
+<p>
+Say there is a topic about orders placed on a ecommere website. 
+There are two teams that need this data.
+Team 1 needs it for analytics and Team 2 needs it for fraud detection. Each team forms a consumer group. This ensures that each group can read the same data independently without interfering with each other.
+</p>
+Example 1:
+
+Topic has 6 partitions.
+
+Consumer group A has 3 consumers.
+
+<pre><code>
+Consumer A → P0, P1
+Consumer B → P2, P3
+Consumer C → P4, P5
+</code></pre>
+
+Example 2:
+
+Topic has 6 partitions.
+
+Consumer group B has 7 consumers.
+
+<pre><code>
+Consumer A → P0
+Consumer B → P1
+Consumer C → P2
+Consumer D → P3
+Consumer E → P4
+Consumer F → P5
+Consumer G → Standby (no partition assigned)
+</code></pre>
+
+Rules:
+
+<ul>
+<li>each partition assigned to only one consumer per group.</li>
+<li>multiple groups can read same topic independently</li>
+</ul>
+
+This allows multiple applications to process the same events.
+
+Example:
+
+<ul>
+<li>analytics-service</li>
+<li>fraud-detection-service</li>
+<li>warehouse-service</li>
+</ul>
+
+All reading the same order events.
+
+
+
+<h2>Part 2 — Advanced: Kafka Internals</h2>
+
+
+<h3>Offsets</h3>
+
+<p>
+Each message in a partition has an <strong>offset</strong>.
+</p>
+
+Offsets are sequential numbers.
+
+<pre><code>
+Partition 0
+
+Offset 0 → message
+Offset 1 → message
+Offset 2 → message
+</code></pre>
+
+Consumers store offsets to know where they left off.
+
+Kafka stores offsets inside a special topic:
+
+<pre><code>
+__consumer_offsets
+</code></pre>
+
+<p>
+Consumer offsets are stored at the consumer group level. Each consumer group maintains its own offset for every partition of a topic. Offsets are stored in Kafka’s internal<strong>__consumer_offsets</strong> topic. 
+</p>
+<p>
+This allows multiple consumer groups to read the same topic independently without interfering with each other. 
+The total number of stored offsets equals the number of partitions multiplied by the number of consumer groups.
+
+</p>
+Example:
+<br>
+Topic: orders<br>
+Partitions: 4
+<br><br>
+Consumer groups:
+<pre><code>
+analytics-service
+fraud-service
+warehouse-service
+</code></pre>
+
+Kafka stores offsets like this:
+<pre><code>analytics-service
+  partition 0 → offset 50
+  partition 1 → offset 60
+  partition 2 → offset 40
+  partition 3 → offset 10
+
+fraud-service
+  partition 0 → offset 55
+  partition 1 → offset 62
+  partition 2 → offset 42
+  partition 3 → offset 11
+
+warehouse-service
+  partition 0 → offset 51
+  partition 1 → offset 61
+  partition 2 → offset 43
+  partition 3 → offset 12</code></pre>
+
+<p><strong><em>In a nutshell, Different readers can read the same book but be on different pages.</em></strong> </p>
+
+
+<h3>Replication and Fault Tolerance</h3>
+
+<p>Kafka protects data using <strong>replication</strong>.
+
+Each partition has multiple replicas.</p>
+
+
+
+Example:
+
+<pre><code>
+Partition P0
+
+Leader → Broker 1
+Replica → Broker 2
+Replica → Broker 3
+</code></pre>
+
+<p>All writes go to the <strong>leader</strong>.
+
+Followers replicate the data.
+
+If the leader crashes:
+
+Another replica becomes leader automatically.
+
+This is called <strong>leader election</strong>.
+</p>
+
+
+
+
+
+<h3>Delivery Guarantees</h3>
+
+Kafka supports three delivery modes.
+
+At-most-once  
+At-least-once  
+Exactly-once
+
+Summary:
+
+<ul>
+<li>at-most-once → possible message loss</li>
+<li>at-least-once → no loss but duplicates possible</li>
+<li>exactly-once → no duplicates, no loss</li>
+</ul>
+
+Exactly-once requires:
+
+<ul>
+<li>idempotent producers</li>
+<li>transactions</li>
+</ul>
+
+Used in financial systems where duplicates are unacceptable.
+
+
+
+<h3>Producer Optimizations</h3>
+
+<p>
+Sending one message at a time over the network is slow. Every message would require: opening a network request, 
+sending headers, sending the message, waiting for acknowledgment. 
+<br>Kafka solves this using batching.
+Instead of sending messages individually, the producer collects multiple messages in memory and sends them together in a single request.
+</p>
+
+Now the flow becomes:
+<pre><code>
+Producer Buffer
+
+msg1
+msg2
+msg3
+msg4
+msg5
+   ↓
+BATCH
+   ↓
+single network request
+</code></pre>
+
+<pre><code>
+Producer
+   ↓
+Batch [msg1 msg2 msg3 msg4 msg5]
+   ↓
+Kafka Broker
+</code></pre>
+
+<p>Instead of <strong>5 requests</strong>, we send <strong>1 request</strong>.
+
+Much faster.</p>
+
+
+
+<h3>>> Where Does Batching Happen?</h3>
+<p>
+Batching happens <strong>inside the producer application</strong>, in memory.
+
+The producer maintains <strong>buffers for each partition</strong>.
+</p>
+
+Example:
+
+<pre><code>
+Producer Memory
+
+Partition 0 buffer
+msg1
+msg3
+msg7
+
+Partition 1 buffer
+msg2
+msg4
+msg6
+</code></pre>
+
+<p>Each partition gets its own batch.
+
+When a batch is ready, Kafka sends it to the <strong>leader broker of that partition</strong>.</p>
+
+
+
+<h3>>> Two Configurations Control Batching</h3>
+
+Two producer settings determine when batches are sent.
+
+<b>batch.size</b>
+
+Maximum size of a batch in bytes.
+
+<b>linger.ms</b>
+How long the producer waits for more messages before sending the batch.
+<br><br>
+If batch.size is 1MB and linger.ms is 100ms, the producer will send a batch when either:
+<ul>
+<li>the batch reaches the maximum size (batch.size)</li>
+<li>the linger time expires (linger.ms)</li>
+</ul>
+
+<h3>Consumer Polling and Fetching</h3>
+
+Consumers fetch batches of messages.
+
+Important settings:
+
+<ul>
+<li>max.poll.records</li>
+<li>fetch.min.bytes</li>
+<li>fetch.max.bytes</li>
+</ul>
+
+<p>Consumers also send <strong>heartbeats</strong> to Kafka to show they are alive.</p>
+
+<p>If a consumer stops heartbeating, Kafka triggers <strong>rebalance</strong>.</p>
+
+<p>Rebalacing means redistributing the partitions among the available consumers.</p>
+
+
+
+<h3>Kafka Streams</h3>
+
+Kafka Streams allows real-time processing.
+
+Example operations:
+
+<ul>
+<li>filter events</li>
+<li>aggregate counts</li>
+<li>join streams</li>
+<li>windowed computations</li>
+</ul>
+
+Example pipeline:
+
+<pre><code>
+orders topic → stream processor → analytics topic
+</code></pre>
+
+<p>Streams can maintain state locally using RocksDB.
+
+State changes are backed up using <strong>changelog topics</strong>.
+</p>
+
+
+
+<h3>Kafka Connect</h3>
+
+Kafka Connect moves data between Kafka and other systems.
+
+Example pipelines:
+
+<pre><code>
+MySQL → Kafka
+Kafka → Elasticsearch
+Kafka → Data Warehouse
+</code></pre>
+
+Connectors eliminate the need to write custom ingestion code.
+
+Engineers everywhere are grateful.
+
+
+
+<h3>Why Kafka Is So Fast</h3>
+
+Kafka performance comes from several design choices:
+
+<ul>
+<li>append-only log storage</li>
+<li>sequential disk writes</li>
+<li>zero-copy network transfer</li>
+<li>partition parallelism</li>
+<li>batching and compression</li>
+</ul>
+
+<p>These allow Kafka clusters to handle <strong>millions of events per second</strong>.
+</p>
+
+
+
+<h2>Final Thoughts</h2>
+
+Kafka started as a messaging system.
+
+Today it powers:
+
+<ul>
+<li>event-driven architectures</li>
+<li>real-time analytics</li>
+<li>stream processing pipelines</li>
+<li>microservice communication</li>
+</ul>
+
+<p>At its core Kafka solves one simple problem:
+
+<strong>moving large amounts of data safely between systems.</strong></p>
+
+
+Once you understand topics, partitions, producers, and consumer groups, the rest of Kafka becomes surprisingly logical.
+
+And that is the moment when distributed systems stop looking terrifying and start looking fascinating.
+
+Or at least fascinating enough to keep reading.
+
+</section>
+
+<a href="../blogs.html" class="button button--ghost">← Back to Blog</a>
+
+</article>
+
+</main>
+
+<footer class="site-footer" id="site-footer"></footer>
+
+<script src="../main.js"></script>
+
+</body>
+</html>
