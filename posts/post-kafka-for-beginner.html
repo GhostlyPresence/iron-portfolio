@@ -32,7 +32,7 @@ Distributed Systems · Kafka · 15 min read
 </p>
 
 <h1 class="page-header__title">
-Kafka Explained From First Principles
+Kafka Explained: Apache not Franz
 </h1>
 
 <p class="page-header__subtitle">
@@ -653,52 +653,6 @@ Important settings:
 <p>If a consumer stops heartbeating, Kafka triggers <strong>rebalance</strong>.</p>
 
 <p>Rebalacing means redistributing the partitions among the available consumers.</p>
-
-
-
-<h3>Kafka Streams</h3>
-
-Kafka Streams allows real-time processing.
-
-Example operations:
-
-<ul>
-<li>filter events</li>
-<li>aggregate counts</li>
-<li>join streams</li>
-<li>windowed computations</li>
-</ul>
-
-Example pipeline:
-
-<pre><code>
-orders topic → stream processor → analytics topic
-</code></pre>
-
-<p>Streams can maintain state locally using RocksDB.
-
-State changes are backed up using <strong>changelog topics</strong>.
-</p>
-
-
-
-<h3>Kafka Connect</h3>
-
-Kafka Connect moves data between Kafka and other systems.
-
-Example pipelines:
-
-<pre><code>
-MySQL → Kafka
-Kafka → Elasticsearch
-Kafka → Data Warehouse
-</code></pre>
-
-Connectors eliminate the need to write custom ingestion code.
-
-Engineers everywhere are grateful.
-
-
 
 <h3>Why Kafka Is So Fast</h3>
 

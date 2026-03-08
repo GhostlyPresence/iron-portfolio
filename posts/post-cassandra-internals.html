@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>What Happens When Cassandra Receives a Write · Blog · Manas S.</title>
+
+  <link rel="stylesheet" href="../styles.css" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  <link href="https://fonts.googleapis.com/css2?family=Marcellus&display=swap" rel="stylesheet" />
+
+  <link rel="icon" type="image/png" href="../images/logo.png" />
+</head>
+
+<body class="page" data-page="blog-post" data-footer-note="Quiet notes from the path.">
+  <header class="site-header" id="site-header"></header>
+
+  <main class="page__main">
+    <article class="stack">
+      <header class="page-header">
+        <p class="page-header__eyebrow">
+          Distributed Systems · Cassandra · 10 min read
+        </p>
+
+        <h1 class="page-header__title">
+          What Happens When Cassandra Receives a Write Request
+        </h1>
+
+        <p class="page-header__subtitle">
+          A beginner-friendly walkthrough of how Cassandra stores data — Journey through
+          commit log to memtables, and SSTables
+        </p>
+      </header>
+      <figure class="post-hero">
+        <img src="./images/post-cassandra/cover.webp"
+          alt="Fantasy illustration used as a companion image for this article" class="post-hero__image" />
+      </figure>
+
+      <section class="stack">
+        <p>
+          Distributed systems can feel mysterious at first. Data goes in
+          somewhere, and somehow it ends up safely stored across machines.
+          Cassandra is one of those systems that quietly does a lot of work
+          behind the scenes to make writes fast, durable, and scalable.
+        </p>
+
+        <p>
+          In this post we’ll walk through what actually happens when Cassandra
+          receives a write request. Step by step. From the moment a request
+          arrives at a node, to how it is stored in memory, written to disk,
+          and eventually cleaned up through compaction.
+        </p>
+
+        <p>
+          Think of it as following a single piece of data through Cassandra’s
+          storage engine.
+        </p>
+      </section>
+
+      <section class="stack">
+        <h2>The Beginning: A Client Sends a Write</h2>
+
+        <p>Imagine a simple table storing chat messages.</p>
+
+        <pre><code>CREATE TABLE messages (
+    chat_id text,
+    message_time timestamp,
+    message text,
+    PRIMARY KEY (chat_id, message_time)
+);
+</code></pre>
+
+        <p>A client now sends a write request.</p>
+
+        <pre><code>INSERT INTO messages (chat_id, message_time, message)
+VALUES ('chat123', '2026-01-01 10:00:00', 'Hello Cassandra!');
+</code></pre>
+
+        <p>
+          The request first arrives at one Cassandra node. This node becomes
+          the <strong>coordinator</strong> for the request.
+        </p>
+
+        <p>The coordinator’s job is simple:</p>
+        <ul>
+          <li>Figure out which nodes should store the data</li>
+          <li>Send the write to those replica nodes</li>
+          <li>Wait for enough responses based on the consistency level</li>
+        </ul>
+
+        <p>
+          Once the coordinator knows the replica nodes, the real storage work
+          begins.
+        </p>
+      </section>
+
+      <section class="stack">
+        <h2>Step 1: Writing to the Commit Log</h2>
+
+        <p>
+          The first place Cassandra writes your data is the
+          <strong>Commit Log</strong>.
+        </p>
+
+        <p>
+          Think of the commit log like a journal. Every change is written there
+          first.
+        </p>
+
+        <p>
+          Memory can disappear if a machine crashes. The commit log ensures
+          that Cassandra can always recover recent writes.
+        </p>
+
+        <p>The write flow begins like this:</p>
+
+        <pre><code>Write Request
+      ↓
+Append to Commit Log
+</code></pre>
+
+        <p>Important properties of the commit log:</p>
+
+        <ul>
+          <li>It is append-only</li>
+          <li>Writes are sequential on disk</li>
+          <li>Sequential disk writes are extremely fast</li>
+        </ul>
+
+        <p>
+          Cassandra avoids random disk writes and simply adds new entries to
+          the end of the file.
+        </p>
+      </section>
+
+      <section class="stack">
+        <h2>What “Append-Only” Means in the Commit Log</h2>
+
+        <p>
+          When Cassandra writes to the commit log, it never modifies existing data inside the file.
+          Instead, it simply adds new entries to the end of the file.
+        </p>
+        <p>
+          In other words:
+          <br>
+          <strong><em>old data stays untouched, new data is appended at the end</em></strong>
+
+        </p>
+
+        <p>
+          Think of it like writing in a notebook.
+
+          You don’t go back and erase previous pages when you add a new note.
+          You just write the new note on the next empty line.
+        </p>
+
+        <h3>Let see this in action with an example:</h3>
+
+        First Write:
+
+        <pre><code>INSERT user1 → "Manas"</code></pre>
+
+        Commit log file:
+        <pre><code>[user1, Manas]</code></pre>
+
+        Second Write:
+
+        <pre><code>INSERT user2 → "Aparna"</code></pre>
+
+        Commit log file:
+        <pre><code>[user1, Manas], 
+[user2, Aparna]</code></pre>
+
+        Third Write:
+
+        <pre><code>UPDATE user1 → "Manas Sinha"</code></pre>
+
+        Commit log file:
+        <pre><code>[user1, Manas]
+[user2, Aparna]
+[user1, Manas Sinha]</code></pre>
+
+          <strong><em>Cassandra still does not modify the old entry.
+It simply appends a new one.</em></strong>
+
+
+      </section>
+
+      <section class="stack">
+        <h2>Why Cassandra Uses Append-Only Logs</h2>
+
+        <p>
+          There are 2 main reasons why Cassandra uses an append-only design for the commit log:
+        </p>
+        <h3>1. Disk Performance</h3>
+        <p>
+          Modern hard drives and SSDs are optimized for sequential writes. When data is written in a continuous stream, the disk can write it much faster than if it had to jump around to modify existing data.
+        </p>
+        <h3>2. Crash recovery</h3>
+        <p>
+          The commit log ensures durability. If a node crashes, Cassandra can
+          replay the commit log to recover any recent writes that were not yet
+          flushed to disk.
+        </p>
+
+        <p>
+          This design allows Cassandra to provide strong durability guarantees
+          while still keeping writes fast.
+        </p>
+      </section>
+        <section class="stack">
+          <h2>Step 2: Writing to the MemTable</h2>
+
+          <p>
+            After the commit log write succeeds, Cassandra stores the data in
+            the <strong>MemTable</strong>.
+          </p>
+
+          <p>
+            A MemTable is an in-memory data structure that temporarily stores
+            recent writes.
+          </p>
+
+          <p>
+            Internally it behaves like a sorted map. Rows are organized like
+            this:
+          </p>
+
+          <pre><code>Partition Key → Clustering Key → Row Data
+</code></pre>
+
+          <p>
+            If messages arrive in random order, Cassandra still keeps them
+            sorted inside the MemTable.
+          </p>
+
+          <pre><code>chat1
+  ├─ 10:00 → "Hi"
+  ├─ 10:01 → "Hello"
+  └─ 10:02 → "What's up?"
+
+chat2
+  ├─ 10:03 → "How are you?"
+  └─ 10:05 → "Hey!"
+</code></pre>
+
+          <p>Two key properties:</p>
+
+          <ul>
+            <li>Rows are grouped by partition key</li>
+            <li>Rows inside a partition are sorted by clustering key</li>
+          </ul>
+        </section>
+
+        <section class="stack">
+          <h2>Step 3: Flushing the MemTable</h2>
+
+          <p>
+            MemTables cannot grow forever. Eventually Cassandra must write them
+            to disk.
+          </p>
+
+          <p>This happens when:</p>
+
+          <ul>
+            <li>The MemTable reaches its size limit</li>
+            <li>Memory pressure triggers a flush</li>
+            <li>The system decides to flush periodically</li>
+          </ul>
+
+          <p>
+            When flushing happens, Cassandra writes the MemTable to disk as an
+            <strong>SSTable</strong>.
+          </p>
+        </section>
+
+        <section class="stack">
+          <h2>Step 4: SSTables</h2>
+
+          <p>
+            SSTable stands for <em>Sorted String Table</em>. It is the main
+            on-disk storage format Cassandra uses.
+          </p>
+
+          <p>An SSTable is:</p>
+
+          <ul>
+            <li>Immutable</li>
+            <li>Sorted</li>
+            <li>Stored on disk</li>
+          </ul>
+
+          <p>
+            Because the MemTable was already sorted, Cassandra simply writes the
+            data sequentially to disk.
+          </p>
+
+          <pre><code>SSTable
+
+Partition: chat1
+  10:00 → Hi
+  10:01 → Hello
+  10:02 → What's up?
+
+Partition: chat2
+  10:03 → How are you?
+  10:05 → Hey
+</code></pre>
+
+          <p>
+            Once the flush completes, Cassandra can clear the MemTable and reuse
+            that memory.
+          </p>
+        </section>
+
+        <section class="stack">
+          <h2>Updates and Deletes</h2>
+
+          <p>
+            Cassandra does not update rows in place. Instead, every change is
+            simply written again with a newer timestamp.
+          </p>
+
+          <p>This means:</p>
+
+          <ul>
+            <li>INSERT is a write</li>
+            <li>UPDATE is a write</li>
+            <li>DELETE is also a write</li>
+          </ul>
+
+          <p>
+            When Cassandra reads data later, it merges rows from multiple
+            SSTables and returns the newest version.
+          </p>
+        </section>
+
+        <section class="stack">
+          <h2>Tombstones</h2>
+
+          <p>
+            Deletes in Cassandra do not immediately remove data. Instead the
+            system writes a marker called a <strong>tombstone</strong>.
+          </p>
+
+          <pre><code>(chat123, 10:00) → TOMBSTONE
+</code></pre>
+
+          <p>
+            This marker ensures that deleted data will eventually be removed
+            across all replicas in the cluster.
+          </p>
+        </section>
+
+        <section class="stack">
+          <h2>Compaction</h2>
+
+          <p>
+            Over time Cassandra accumulates many SSTables. Some contain old
+            values, others contain newer ones.
+          </p>
+
+          <p>
+            To keep the system efficient, Cassandra runs a background process
+            called <strong>compaction</strong>.
+          </p>
+
+          <p>During compaction Cassandra:</p>
+
+          <ul>
+            <li>Reads multiple SSTables</li>
+            <li>Merges their contents</li>
+            <li>Applies tombstones</li>
+            <li>Writes a new optimized SSTable</li>
+          </ul>
+
+          <p>After compaction the old SSTables are deleted.</p>
+        </section>
+
+        <section class="stack">
+  <h2>A Concrete Example of Compaction</h2>
+
+  <p>
+    To really understand compaction, it helps to look at a small example.
+    Imagine Cassandra has already flushed several MemTables to disk, creating
+    three SSTables.
+  </p>
+
+  <p>
+    These SSTables might contain different versions of the same row because
+    Cassandra never updates files in place.
+  </p>
+
+  <p>Suppose our table contains chat messages like this:</p>
+
+<pre><code>PRIMARY KEY (chat_id, message_time)
+</code></pre>
+
+  <p>Over time Cassandra might produce SSTables like the following.</p>
+
+  <h3>SSTable 1</h3>
+
+<pre><code>Partition: chat1
+  10:00 → "Rest in peace my granny"
+  10:01 → "She got hit by a bazooka"
+
+Partition: chat2
+  10:03 → "Kabloom"
+</code></pre>
+
+  <p>
+    Later, someone edits a message and deletes another. Cassandra writes new
+    entries instead of modifying the existing SSTable.
+  </p>
+
+  <h3>SSTable 2</h3>
+
+<pre><code>Partition: chat1
+  10:01 → "Kabloom Kablow"   (updated message)
+</code></pre>
+
+  <h3>SSTable 3</h3>
+
+<pre><code>Partition: chat1
+  10:00 → TOMBSTONE       (message deleted)
+</code></pre>
+
+  <p>
+    At this point Cassandra now has three SSTables that contain overlapping
+    pieces of data.
+  </p>
+
+  <p>
+    If a read happens for <code>chat1</code>, Cassandra must merge data from
+    multiple SSTables to determine the correct result.
+  </p>
+
+  <p>This is where <strong>compaction</strong> helps.</p>
+
+  <h3>During Compaction</h3>
+
+  <p>
+    Cassandra reads rows from all SSTables and resolves them using timestamps.
+  </p>
+
+  <ul>
+    <li>The newer message replaces the older version.</li>
+    <li>The tombstone hides the deleted row.</li>
+  </ul>
+
+  <p>The merge looks like this internally:</p>
+
+<pre><code>
+Input SSTables
+--------------
+
+SSTable1
+chat1
+ 10:00 → "Rest in peace my granny"
+ 10:01 → "She got hit by a bazooka"
+
+SSTable2
+chat1
+ 10:01 → "Kabloom Kablow"
+
+SSTable3
+chat1
+ 10:00 → TOMBSTONE
+</code></pre>
+
+  <p>
+    Cassandra processes the rows in sorted order and applies the newest
+    timestamps.
+  </p>
+
+  <h3>Resulting SSTable After Compaction</h3>
+
+<pre><code>SSTable_new
+
+Partition: chat1
+  10:01 → "She got hit by a bazooka"
+
+Partition: chat2
+  10:03 → "Kabloom Kablow"
+</code></pre>
+
+  <p>
+    The row <code>(chat1, 10:00)</code> disappeared because the tombstone
+    indicated it was deleted.
+  </p>
+
+  <p>
+    Once the compaction finishes, Cassandra deletes the old SSTables and keeps
+    the new compacted one.
+  </p>
+
+  <p>
+    The result is fewer files, cleaner data, and faster reads for future
+    queries.
+  </p>
+</section>
+
+        <section class="stack">
+          <h2>The Entire Write Path</h2>
+
+          <pre><code>Client Write
+      ↓
+Coordinator Node
+      ↓
+Commit Log (durability)
+      ↓
+MemTable (in memory)
+      ↓
+Flush
+      ↓
+SSTable (on disk)
+      ↓
+More writes → more SSTables
+      ↓
+Compaction merges them
+</code></pre>
+
+          <p>
+            Every step is designed with one goal: make writes extremely fast
+            while maintaining durability and consistency.
+          </p>
+        </section>
+
+        <section class="stack">
+          <h2>Final Thoughts</h2>
+
+          <p>
+            Cassandra’s storage engine may feel unusual if you come from
+            traditional databases.
+          </p>
+
+          <p>
+            But the philosophy behind it is surprisingly simple:
+          </p>
+
+          <ul>
+            <li>Append new data</li>
+            <li>Never rewrite existing files</li>
+            <li>Merge things later in the background</li>
+          </ul>
+
+          <p>
+            This design allows Cassandra to handle massive distributed workloads
+            while still keeping writes fast and reliable.
+          </p>
+        </section>
+
+        <a href="../blogs.html" class="button button--ghost">← Back to Blog</a>
+    </article>
+  </main>
+
+  <footer class="site-footer" id="site-footer"></footer>
+
+  <script src="../main.js"></script>
+</body>
+
+</html>
