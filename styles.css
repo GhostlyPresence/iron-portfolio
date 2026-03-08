@@ -15,6 +15,7 @@
   );
   --color-surface-sidebar: rgba(245, 241, 233, 0.9);
   --color-surface-ghost: rgba(245, 241, 233, 0.7);
+  --color-surface-green: rgba(193, 255, 169, 0.8);
   --color-surface-ghost-hover: rgba(245, 241, 233, 0.9);
 
   /* Semantic borders */
@@ -266,6 +267,16 @@ a {
 }
 
 .button--ghost:hover {
+  border-color: var(--color-border-pill);
+  background-color: var(--color-surface-ghost-hover);
+}
+
+.button--green {
+  border-color: var(--color-border-soft);
+  background-color: var(--color-surface-green)
+}
+
+.button--green:hover {
   border-color: var(--color-border-pill);
   background-color: var(--color-surface-ghost-hover);
 }

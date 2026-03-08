@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Kafka Explained From First Principles · Blog · Manas S.</title>
+
+<link rel="stylesheet" href="../styles.css" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&display=swap" rel="stylesheet"/>
+
+<link rel="icon" type="image/png" href="../images/logo.png">
+
+</head>
+
+<body class="page" data-page="blog-post" data-footer-note="Notes on distributed systems.">
+
+<header class="site-header" id="site-header"></header>
+
+<main class="page__main">
+
+<article class="stack">
+
+<header class="page-header">
+
+<p class="page-header__eyebrow">
+Distributed Systems · Kafka · 8 min read
+</p>
+
+<h1 class="page-header__title">
+Kafka Explained: Apache not Franz - Continued
+</h1>
+
+<p class="page-header__subtitle">
+Building on the basics, we dive deeper into Kafka's architecture, use cases, and why it's a cornerstone of modern data infrastructure.
+
+</p>
+
+</header>
+
+<figure class="post-hero">
+        <img src="./images/post-kafka/cover.webp"
+          alt="Illustration used as a companion image for the Kafka article" class="post-hero__image" />
+      </figure>
+
+
+
+<section class="stack">
+
+<h2>Part 2 — Advanced: Kafka Internals</h2>
+
+
+<h3>Offsets</h3>
+
+<p>
+Each message in a partition has an <strong>offset</strong>.
+</p>
+
+Offsets are sequential numbers.
+
+<pre><code>
+Partition 0
+
+Offset 0 → message
+Offset 1 → message
+Offset 2 → message
+</code></pre>
+
+Consumers store offsets to know where they left off.
+
+Kafka stores offsets inside a special topic:
+
+<pre><code>
+__consumer_offsets
+</code></pre>
+
+<p>
+Consumer offsets are stored at the consumer group level. Each consumer group maintains its own offset for every partition of a topic. Offsets are stored in Kafka’s internal<strong>__consumer_offsets</strong> topic. 
+</p>
+<p>
+This allows multiple consumer groups to read the same topic independently without interfering with each other. 
+The total number of stored offsets equals the number of partitions multiplied by the number of consumer groups.
+
+</p>
+Example:
+<br>
+Topic: orders<br>
+Partitions: 4
+<br><br>
+Consumer groups:
+<pre><code>
+analytics-service
+fraud-service
+warehouse-service
+</code></pre>
+
+Kafka stores offsets like this:
+<pre><code>analytics-service
+  partition 0 → offset 50
+  partition 1 → offset 60
+  partition 2 → offset 40
+  partition 3 → offset 10
+
+fraud-service
+  partition 0 → offset 55
+  partition 1 → offset 62
+  partition 2 → offset 42
+  partition 3 → offset 11
+
+warehouse-service
+  partition 0 → offset 51
+  partition 1 → offset 61
+  partition 2 → offset 43
+  partition 3 → offset 12</code></pre>
+
+<p><strong><em>In a nutshell, Different readers can read the same book but be on different pages.</em></strong> </p>
+
+
+<h3>Replication and Fault Tolerance</h3>
+
+<p>Kafka protects data using <strong>replication</strong>.
+
+Each partition has multiple replicas.</p>
+
+
+
+Example:
+
+<pre><code>
+Partition P0
+
+Leader → Broker 1
+Replica → Broker 2
+Replica → Broker 3
+</code></pre>
+
+<p>All writes go to the <strong>leader</strong>.
+
+Followers replicate the data.
+
+If the leader crashes:
+
+Another replica becomes leader automatically.
+
+This is called <strong>leader election</strong>.
+</p>
+
+
+
+
+
+<h3>Delivery Guarantees</h3>
+
+Kafka supports three delivery modes.
+
+At-most-once  
+At-least-once  
+Exactly-once
+
+Summary:
+
+<ul>
+<li>at-most-once → possible message loss</li>
+<li>at-least-once → no loss but duplicates possible</li>
+<li>exactly-once → no duplicates, no loss</li>
+</ul>
+
+Exactly-once requires:
+
+<ul>
+<li>idempotent producers</li>
+<li>transactions</li>
+</ul>
+
+Used in financial systems where duplicates are unacceptable.
+
+
+
+<h3>Producer Optimizations</h3>
+
+<p>
+Sending one message at a time over the network is slow. Every message would require: opening a network request, 
+sending headers, sending the message, waiting for acknowledgment. 
+<br>Kafka solves this using batching.
+Instead of sending messages individually, the producer collects multiple messages in memory and sends them together in a single request.
+</p>
+
+Now the flow becomes:
+<pre><code>
+Producer Buffer
+
+msg1
+msg2
+msg3
+msg4
+msg5
+   ↓
+BATCH
+   ↓
+single network request
+</code></pre>
+
+<pre><code>
+Producer
+   ↓
+Batch [msg1 msg2 msg3 msg4 msg5]
+   ↓
+Kafka Broker
+</code></pre>
+
+<p>Instead of <strong>5 requests</strong>, we send <strong>1 request</strong>.
+
+Much faster.</p>
+
+
+
+<h3>>> Where Does Batching Happen?</h3>
+<p>
+Batching happens <strong>inside the producer application</strong>, in memory.
+
+The producer maintains <strong>buffers for each partition</strong>.
+</p>
+
+Example:
+
+<pre><code>
+Producer Memory
+
+Partition 0 buffer
+msg1
+msg3
+msg7
+
+Partition 1 buffer
+msg2
+msg4
+msg6
+</code></pre>
+
+<p>Each partition gets its own batch.
+
+When a batch is ready, Kafka sends it to the <strong>leader broker of that partition</strong>.</p>
+
+
+
+<h3>>> Two Configurations Control Batching</h3>
+
+Two producer settings determine when batches are sent.
+
+<b>batch.size</b>
+
+Maximum size of a batch in bytes.
+
+<b>linger.ms</b>
+How long the producer waits for more messages before sending the batch.
+<br><br>
+If batch.size is 1MB and linger.ms is 100ms, the producer will send a batch when either:
+<ul>
+<li>the batch reaches the maximum size (batch.size)</li>
+<li>the linger time expires (linger.ms)</li>
+</ul>
+
+<h3>Consumer Polling and Fetching</h3>
+
+Consumers fetch batches of messages.
+
+Important settings:
+
+<ul>
+<li><strong>max.poll.records</strong>: This controls how many records returned in a single poll() call.</li>
+<br>
+<li><strong>fetch.min.bytes</strong>: This controls the minimum amount of data that must be available before a fetch request is sent. 
+  This means if fetch.min.bytes: 5000 and a consumer sends a fetch request, the broker will wait until at least 5000 bytes of data are available.</li>
+  <br>
+<li><strong>fetch.max.wait.ms</strong>: This setting defines the maximum time the broker will wait before returning whatever data is available. 
+  So if <strong><em>fetch.min.bytes</em></strong> is not met within the <strong><em>fetch.max.wait.ms</em></strong> time, the broker will return whatever data is available, 
+  even if it is less than <strong><em>fetch.min.bytes</em></strong>.</li>
+  <br>
+</li>
+<li><strong>fetch.max.bytes</strong>: This controls the maximum amount of data that can be fetched in a single request by a consumer.</li>
+</ul>
+<p>Although you might be thinking that if we already have <em>max.poll.records</em> why do we need <em>fetch.max.bytes</em>?
+</p>
+
+<p>
+  The answer is something called <strong>consumer fetch buffer</strong>. When a consumer fetches data, kafka returns <em>fetch.max.bytes</em> size of data which is stored in consumer fetch buffer.
+  When a conumer poll() is done, from this buffer, <em>max.poll.records</em> number of records are returned to the consumer application.
+</p>
+
+The flow looks something like this:
+
+<pre><code>Broker
+  │
+  │ (fetch response)
+  ▼
+Consumer Fetch Buffer
+(max size controlled by fetch.max.bytes)
+  │
+  │ poll()
+  ▼
+Application
+(max records controlled by max.poll.records)</code></pre>
+
+
+<h3>Heartbeats and Rebalancing</h3>
+<p>Consumers also send <strong>heartbeats</strong> to Kafka to show they are alive.</p>
+
+<p>If a consumer stops heartbeating, Kafka triggers <strong>rebalance</strong>.</p>
+
+<p>Rebalacing means redistributing the partitions among the available consumers.</p>
+
+<h3>Entire producer to consumer mental model</h3>
+<pre><code>
+                PRODUCER SIDE
+────────────────────────────────────────────
+
+Application
+    │
+    │ producer.send()
+    ▼
+Producer Record
+    │
+    │
+    ▼
+Producer Memory Buffer (per partition)
+    │
+    │  batching happens here
+    │
+    │  Controlled by:
+    │  ─ batch.size
+    │  ─ linger.ms
+    │  ─ compression.type
+    ▼
+Producer Batch
+[msg1 msg2 msg3 msg4 msg5]
+    │
+    │ network request
+    ▼
+
+
+                KAFKA BROKER
+────────────────────────────────────────────
+
+Broker Leader (Partition Log)
+
+Partition P0
+Offset 0 → msg1
+Offset 1 → msg2
+Offset 2 → msg3
+Offset 3 → msg4
+Offset 4 → msg5
+
+Replication happens here for fault tolerance
+
+
+                CONSUMER SIDE
+────────────────────────────────────────────
+
+Consumer
+    │
+    │ fetch request
+    │
+    │ Controlled by:
+    │ ─ fetch.min.bytes
+    │ ─ fetch.max.wait.ms
+    ▼
+Broker prepares fetch response
+    │
+    │ Size limited by:
+    │ ─ fetch.max.bytes
+    │ ─ max.partition.fetch.bytes
+    ▼
+
+
+Consumer Fetch Buffer (memory)
+[msg1 msg2 msg3 msg4 msg5 ...]
+
+    │
+    │ application calls
+    │ consumer.poll()
+    │
+    │ Controlled by:
+    │ ─ max.poll.records
+    ▼
+
+
+Application Processing
+
+process(msg1)
+process(msg2)
+process(msg3)
+...
+</code></pre>
+
+<h3>Why Kafka Is So Fast</h3>
+
+Kafka performance comes from several design choices:
+
+<ul>
+<li>append-only log storage</li>
+<li>sequential disk writes</li>
+<li>zero-copy network transfer</li>
+<li>partition parallelism</li>
+<li>batching and compression</li>
+</ul>
+
+<p>These allow Kafka clusters to handle <strong>millions of events per second</strong>.
+</p>
+
+
+
+<h2>Final Thoughts</h2>
+
+Kafka started as a messaging system.
+
+Today it powers:
+
+<ul>
+<li>event-driven architectures</li>
+<li>real-time analytics</li>
+<li>stream processing pipelines</li>
+<li>microservice communication</li>
+</ul>
+
+<p>At its core Kafka solves one simple problem:
+
+<strong>moving large amounts of data safely between systems.</strong></p>
+
+
+Once you understand topics, partitions, producers, and consumer groups, the rest of Kafka becomes surprisingly logical.
+
+And that is the moment when distributed systems stop looking terrifying and start looking fascinating.
+
+Or at least fascinating enough to keep reading.
+
+</section>
+
+<a href="../blogs.html" class="button button--ghost">← Back to Blog</a>
+
+</article>
+
+</main>
+
+<footer class="site-footer" id="site-footer"></footer>
+
+<script src="../main.js"></script>
+
+</body>
+</html>
