@@ -332,7 +332,7 @@ The <strong>key</strong> helps determine which partition the message goes to.
 Kafka uses:
 
 <pre><code>
-partition = hash(key) % number_of_partitions
+partition = hash(key) % number_of_partitions        //kafka uses murmur2 hash under the hood
 </code></pre>
 
 This ensures messages with the same key land in the same partition.
@@ -358,6 +358,9 @@ Because consumers control the speed of processing.
 Kafka never overwhelms slow consumers.
 
 Very polite behaviour.
+
+<br><br> 
+Though they must poll within a configured interval to stay in the group. Otherwise, they are considered dead and their partitions are reassigned.
 
 
 

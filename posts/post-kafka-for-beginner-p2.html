@@ -273,7 +273,7 @@ Important settings:
 <ul>
 <li><strong>max.poll.records</strong>: This controls how many records returned in a single poll() call.</li>
 <br>
-<li><strong>fetch.min.bytes</strong>: This controls the minimum amount of data that must be available before a fetch request is sent. 
+<li><strong>fetch.min.bytes</strong>: This controls the minimum amount of data that must be available before a responding to a fetch request.
   This means if fetch.min.bytes: 5000 and a consumer sends a fetch request, the broker will wait until at least 5000 bytes of data are available.</li>
   <br>
 <li><strong>fetch.max.wait.ms</strong>: This setting defines the maximum time the broker will wait before returning whatever data is available. 
@@ -333,7 +333,6 @@ Producer Memory Buffer (per partition)
     │  Controlled by:
     │  ─ batch.size
     │  ─ linger.ms
-    │  ─ compression.type
     ▼
 Producer Batch
 [msg1 msg2 msg3 msg4 msg5]
