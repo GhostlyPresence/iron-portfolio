@@ -241,7 +241,8 @@
             and the transaction log.
           <br><br>
             During a <strong>refresh</strong> operation, these buffers are
-            converted into a new segment that becomes searchable.
+            converted into a new in-memory segment that becomes searchable.
+            And after a flush operation, the segment is persisted to disk.
           <br>
             This is why Elasticsearch is described as
             <em>near real-time</em> rather than strictly real-time.

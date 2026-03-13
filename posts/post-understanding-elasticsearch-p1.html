@@ -156,7 +156,7 @@
         <pre><code>
 {
   "city": "New Delhi",                  ---- this field is mapped as keyword data type
-  "description": "Capital of India"     ---- this field is mapped as text data type
+  "description": "Capital City India"     ---- this field is mapped as text data type
 }
           </code></pre>
 
@@ -167,7 +167,7 @@
         <pre><code>
 "New Delhi" --> [doc1]          --> The two words will be indexed together as a single token "New Delhi"
 "Capital"   --> [doc1]          --> The word "Capital" will be indexed as a token
-"of"        --> [doc1]          --> The word "of" will be indexed as a token
+"City"        --> [doc1]          --> The word "City" will be indexed as a token
 "India"     --> [doc1]          --> The word "India" will be indexed as a token
           </code></pre>
 
@@ -217,7 +217,7 @@ price between 50 and 200
 price between 50 and 200
 </code></pre>
 
-It would need to scan 150 index entries.
+It would need to look up every individual value that falls in the range, one by one.
 
 So Elasticsearch uses BKD (Balanced K-Dimensional Tree) trees instead.
           </p>

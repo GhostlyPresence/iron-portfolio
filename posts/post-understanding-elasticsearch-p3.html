@@ -196,10 +196,28 @@ shoes
 
         </section>
 
+        <section class="stack">
+
+          <h2>Step 5 — Replication</h2>
+
+          <p>
+            After the primary shard processes the write i.e. it's written to in-memory buffer and translog, the operation is sent to
+            <strong>replica shards</strong>.<br><br>
+
+            Replica shards store copies of the data on other nodes in the cluster.
+            They serve two purposes:
+            <br>• Fault tolerance
+            <br>• Increased search throughput<br><br>
+
+            Once the replicas acknowledge the operation, Elasticsearch confirms
+            that the document has been successfully indexed.
+          </p>
+
+        </section>
 
         <section class="stack">
 
-          <h2>Step 5 — Refresh and Segment Creation</h2>
+          <h2>Step 6 — Refresh and Segment Creation</h2>
 
           <p>
             At this point the document exists in memory and inside the translog,
@@ -221,27 +239,6 @@ shoes
 
         </section>
 
-
-        <section class="stack">
-
-          <h2>Step 6 — Replication</h2>
-
-          <p>
-            After the primary shard processes the write, the operation is sent to
-            <strong>replica shards</strong>.<br><br>
-
-            Replica shards store copies of the data on other nodes in the cluster.
-            They serve two purposes:
-            <br>• Fault tolerance
-            <br>• Increased search throughput<br><br>
-
-            Once the replicas acknowledge the operation, Elasticsearch confirms
-            that the document has been successfully indexed.
-          </p>
-
-        </section>
-
-
         <section class="stack">
 
           <h2>The Complete Write Path</h2>
@@ -257,9 +254,9 @@ In-Memory Indexing Buffer
       ↓
 Translog (durability)
       ↓
-Refresh → Segment Creation
-      ↓
 Replication to Replica Shards
+      ↓
+Refresh → Segment Creation
       ↓
 Document becomes searchable
 </pre>
