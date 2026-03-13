@@ -28,8 +28,7 @@
       </header>
 
       <figure class="post-hero">
-        <img src="./images/post-elastic-search/cover.webp" 
-        alt="Illustration used as a companion image for this article"
+        <img src="./images/post-elastic-search/cover.webp" alt="Illustration used as a companion image for this article"
           class="post-hero__image" />
       </figure>
 
@@ -143,7 +142,8 @@
           The match query analyzes the text and finds documents containing
           similar words.
           <br>
-          One thing to note is that match query can only be applied on fields that has the data type of 'text'.
+          The match query is most useful for fields of data type 'text'. Using it on 'keyword' fields will not work as
+          expected because 'keyword' fields are meant for exact matches.
           <br>
           Refer to the <a href="./post-understanding-elasticsearch-p1.html"> <u>previous article</u></a> for more
           details on data types in Elasticsearch.
@@ -233,8 +233,7 @@
         <p>
           For exact matches, Elasticsearch uses a
           <strong>term query</strong>.
-          Similar to match query, term query can only be applied on fields that has the data type of 'keyword'.
-          <br>
+
           <br>
           So if the brand field is of type 'keyword', we can write a term query like this:
         </p>
@@ -338,9 +337,9 @@
         </p>
 
         <pre><code>
-        Best Lightweight Running Shoes      score = 4.1
-        Running Shoes for Marathon Training score = 3.6
-        Comfortable Shoes for Walking       score = 0.9
+        Best Lightweight Running Shoes                    score = 4.1
+        Long Lasting Running Shoes for Marathon Training  score = 3.6
+        Comfortable Shoes for Walking                     score = 0.9
         </code></pre>
 
         <p>
@@ -367,13 +366,19 @@
 
         <p>
           Matches in shorter fields often receive slightly higher scores because the
-          terms are more concentrated. 
+          terms are more concentrated.
           <br><br>
-          That means that even if "running shoes" was there in both titles: "Best Lightweight Running Shoes" and "Running Shoes for Marathon Training",
-          the first one would get a higher score because the title is shorter and the terms are more concentrated. 
-          <br><br>If the terms that you are searching for make up a larger portion of the text, Elasticsearch considers it a stronger match.
+          That means that even if "running shoes" appears in both titles: "Best Lightweight Running Shoes" and
+          "Long Lasting Running Shoes for Marathon Training", the first one scores higher because BM25 compares
+          each field's length to the average field length across all documents in the index. A match in a shorter
+          field is considered a stronger signal that the query terms make up a larger proportion of the content, so
+          Elasticsearch treats it as more relevant.
+          <br><br>
+          
+          <strong><em>If the terms that you are searching for make up a larger portion of the text, Elasticsearch considers
+          it a stronger match.</em></strong>
         </p>
-        
+
 
         <p><strong>3. Rare Words Matter More</strong></p>
 
